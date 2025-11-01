@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=69.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chromasql"
+version = "0.1.0"
+description = "SQL-like DSL for planning and executing scoped ChromaDB queries."
+readme = "README.md"
+requires-python = ">=3.9"
+license = "LicenseRef-Proprietary"
+authors = [
+  {name = "darshitac11", email = "darshitac11@gmail.com"},
+  {name = "cruxcode", email = "swaroopshyam0@gmail.com"},
+]
+keywords = ["chromadb", "sql", "dsl", "vector-search"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Database",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+  "lark>=1.2,<2.0",
+]
+
+[project.urls]
+Repository = "https://github.com/GetAdriAI/chromasql"
+Documentation = "https://getadriai.github.io/chromasql"
+
+[tool.setuptools]
+packages = ["chromasql"]
+
+[dependency-groups]
+dev = [
+    "mkdocs (>=1.6.1,<2.0.0)",
+    "mkdocs-material (>=9.6.22,<10.0.0)"
+]

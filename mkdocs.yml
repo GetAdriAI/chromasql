@@ -1,0 +1,19 @@
+site_name: ChromaSQL Documentation
+site_description: SQL-like DSL for querying ChromaDB collections.
+repo_url: https://github.com/GetAdriAI/chromasql
+repo_name: GetAdriAI/chromasql
+nav:
+  - Overview: index.md
+  - Getting Started: getting-started.md
+  - Query Language: query-language.md
+  - Examples: examples.md
+  - Multi-Collection: multi-collection.md
+  - Building Extensions: building-extensions.md
+  - Grammar Reference: grammar-reference.md
+theme:
+  name: mkdocs
+markdown_extensions:
+  - admonition
+  - codehilite
+  - toc:
+      permalink: true
