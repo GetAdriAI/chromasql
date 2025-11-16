@@ -15,5 +15,5 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: pip install mkdocs mkdocs-material
+      - run: poetry install
       - run: mkdocs gh-deploy --force --config-file mkdocs.yml
