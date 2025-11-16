@@ -22,7 +22,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Sequence, Set, Tuple, cast
 
-from .ast import (
+from ._ast_nodes import (
     BooleanPredicate,
     ComparisonPredicate,
     ContainsPredicate,

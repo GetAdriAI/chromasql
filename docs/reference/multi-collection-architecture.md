@@ -1,4 +1,4 @@
-# Multi-Collection Query Support - Implementation Summary
+# Multi-Collection Execution Architecture
 
 ## Overview
 
@@ -35,11 +35,7 @@ ChromaSQL now supports executing queries across multiple ChromaDB collections wi
    - Uses query config to map values to collections
    - Configurable fallback behavior
 
-2. **`AsyncMultiCollectionAdapter`** - Wraps existing `AsyncMultiCollectionQueryClient`
-   - Seamlessly integrates with your vectorize_lib infrastructure
-   - Reuses existing connection pooling and caching
-
-3. **`SimpleAsyncClientAdapter`** - Wraps raw ChromaDB async clients
+2. **`SimpleAsyncClientAdapter`** - Wraps raw ChromaDB async clients
    - For simpler setups without query config infrastructure
 
 ### 3. Comprehensive Tests (`tests/chromasql/test_multi_collection.py`)
@@ -148,8 +144,9 @@ query_config.json maps models → collections
 
 ```python
 from pathlib import Path
-from chromasql.adapters import AsyncMultiCollectionAdapter, MetadataFieldRouter
+from chromasql.adapters import MetadataFieldRouter
 from chromasql.multi_collection import execute_multi_collection
+from indexer.query_lib.async_multi_collection_adapter import AsyncMultiCollectionAdapter
 from indexer.vectorize_lib.query_client import AsyncMultiCollectionQueryClient
 from indexer.vectorize_lib.query_config import load_query_config
 

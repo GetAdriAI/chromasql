@@ -74,8 +74,9 @@ Route queries based on `metadata.model` filter using your existing query config:
 ```python
 import asyncio
 from pathlib import Path
-from chromasql.adapters import AsyncMultiCollectionAdapter, MetadataFieldRouter
+from chromasql.adapters import MetadataFieldRouter
 from chromasql.multi_collection import execute_multi_collection
+from indexer.query_lib.async_multi_collection_adapter import AsyncMultiCollectionAdapter
 from indexer.vectorize_lib.query_client import AsyncMultiCollectionQueryClient
 from indexer.vectorize_lib.query_config import load_query_config
 
@@ -289,8 +290,9 @@ Seamlessly integrate ChromaSQL with your existing vectorize_lib infrastructure:
 import asyncio
 from pathlib import Path
 from chromasql import parse, extract_metadata_values
-from chromasql.adapters import AsyncMultiCollectionAdapter, MetadataFieldRouter
+from chromasql.adapters import MetadataFieldRouter
 from chromasql.multi_collection import execute_multi_collection
+from indexer.query_lib.async_multi_collection_adapter import AsyncMultiCollectionAdapter
 from indexer.vectorize_lib.query_client import AsyncMultiCollectionQueryClient
 from indexer.vectorize_lib.query_config import load_query_config
 
@@ -580,3 +582,9 @@ For more information, see:
 - [CONTRIBUTING.md](CONTRIBUTING.md) for architecture details
 - [TUTORIAL.md](TUTORIAL.md) for ChromaSQL syntax reference
 - [chromasql/multi_collection.py](multi_collection.py) for API documentation
+
+<div class="grid cards" markdown>
+
+- [:material-github: **Need Help?**](https://github.com/GetAdriAI/chromasql/issues/new?title=Docs%20Issue&labels=chromasql-py){ target="_blank" }<br/>
+Open a GitHub issue with the steps to reproduce and we’ll help you debug it.
+</div>

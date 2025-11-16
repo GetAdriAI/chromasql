@@ -1,4 +1,4 @@
-# Multi-Collection Routing in ChromaSQL
+# Multi-Collection Routing Playbook
 
 This document provides comprehensive coverage of ChromaSQL's multi-collection routing strategies, including implementation details, edge cases, optimization analysis, and best practices.
 
@@ -690,6 +690,9 @@ WHERE metadata.model = 'Table' AND metadata.has_sem = FALSE
 ---
 
 **Document Version:** 1.0
-**Last Updated:** 2025-01-01
-**Test Coverage:** 43/43 tests passing ✅
+
+**Release Date:** November 1, 2025
+
+**Test Coverage:** 43/43 tests passing
+
 **Total Project Tests:** 151 (chromasql + query_lib)

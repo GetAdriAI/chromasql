@@ -54,7 +54,7 @@ import asyncio
 import logging
 from typing import Any, Dict, List, Optional, Protocol, Sequence
 
-from .ast import Query
+from ._ast_nodes import Query
 from .errors import ChromaSQLExecutionError
 from .executor import EmbedFunction, ExecutionResult
 from .parser import parse

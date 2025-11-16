@@ -1,7 +1,7 @@
-# Query Language
+# ChromaSQL Query Clause Reference
 
 ChromaSQL offers a compact set of clauses tailored to ChromaDB. This page is a
-quick reference; for a narrative walkthrough see `TUTORIAL.md`.
+quick reference; for a narrative walkthrough see the [tutorial series](tutorial/setup.md).
 
 ## Query Skeleton
 
@@ -20,8 +20,7 @@ FROM collection [AS alias]
 [WITH SCORE THRESHOLD x]
 ```
 
-Clauses can appear in any order allowed by the grammar (see the grammar
-reference for details). `USING EMBEDDING` switches the query into vector mode;
+Clauses can appear in any order allowed by the grammar (see the [Grammar Specification](../reference/language-grammar.md) for details). `USING EMBEDDING` switches the query into vector mode;
 omitting it produces a metadata-only `get`.
 
 ## Projection
@@ -86,9 +85,6 @@ drift beyond an acceptable score.
 ```sql
 RERANK BY MMR(lambda = 0.4, candidates = 50)
 ```
-
-The planner records the hint but does not run the reranker. Downstream tooling
-can inspect the plan and apply custom reranking logic.
 
 ## Explain
 

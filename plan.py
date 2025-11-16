@@ -11,7 +11,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, Optional, Tuple
 
-from .ast import OrderItem
+from ._ast_nodes import OrderItem
 
 
 @dataclass(frozen=True)

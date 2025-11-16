@@ -55,13 +55,8 @@ print(plan_dict)
 The explain output mirrors the arguments passed to `collection.query` or
 `collection.get`.
 
-## Running Tests
+<div class="grid cards" markdown>
 
-ChromaSQL ships with a comprehensive test suite. Run it from the repository
-root:
-
-```bash
-poetry run pytest tests/chromasql -q
-```
-
-Add tests whenever you extend the language or touch planner/executor logic.
+- [:material-github: **Need Help?**](https://github.com/GetAdriAI/chromasql/issues/new?title=Docs%20Issue&labels=chromasql-py){ target="_blank" }<br/>
+Open a GitHub issue with the steps to reproduce and we’ll help you debug it.
+</div>

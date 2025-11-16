@@ -432,3 +432,9 @@ Potential improvements (not currently implemented):
 **Last Updated:** 2025-01-01
 **Test Coverage:** 22/22 tests passing
 **Total Test Count:** 151 (chromasql + query_lib)
+
+<div class="grid cards" markdown>
+
+- [:material-github: **Need Help?**](https://github.com/GetAdriAI/chromasql/issues/new?title=Docs%20Issue&labels=chromasql-py){ target="_blank" }<br/>
+Open a GitHub issue with the steps to reproduce and we’ll help you debug it.
+</div>

@@ -27,17 +27,27 @@ classifiers = [
 ]
 dependencies = [
   "lark>=1.2,<2.0",
+  "fastapi>=0.100.0",
+  "uvicorn>=0.23.0",
+  "pyyaml>=6.0",
 ]
 
 [project.urls]
 Repository = "https://github.com/GetAdriAI/chromasql"
 Documentation = "https://getadriai.github.io/chromasql"
 
+[project.scripts]
+chromasql-server = "chromasql.cli:main"
+
 [tool.setuptools]
 packages = ["chromasql"]
+
+[tool.setuptools.package-dir]
+chromasql = "."
 
 [dependency-groups]
 dev = [
     "mkdocs (>=1.6.1,<2.0.0)",
-    "mkdocs-material (>=9.6.22,<10.0.0)"
+    "mkdocs-material (>=9.6.22,<10.0.0)",
+    "mkdocs-macros-plugin (>=1.3.0,<2.0.0)"
 ]

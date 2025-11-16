@@ -1,4 +1,4 @@
-# Grammar Reference
+# ChromaSQL Grammar Specification
 
 ChromaSQL’s grammar is defined in `chromasql/grammar.py` using Lark. This page
 summarizes the top-level productions; consult the source file for the authoritative

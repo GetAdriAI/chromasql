@@ -1,6 +1,6 @@
 # Multi-Collection
 
-Large deployments often shard data across multiple ChromaDB collections. The
+Large deployments often [shard data](reference/glossary/#sharded-deployment) across multiple ChromaDB collections. The
 multi-collection module provides adapters and routing helpers that let you fan
 out a single ChromaSQL query across those shards.
 
@@ -18,8 +18,9 @@ Use the built-in `MetadataFieldRouter` to route by discriminator values stored
 in metadata:
 
 ```python
-from chromasql.adapters import MetadataFieldRouter, AsyncMultiCollectionAdapter
+from chromasql.adapters import MetadataFieldRouter
 from chromasql.multi_collection import execute_multi_collection
+from indexer.query_lib.async_multi_collection_adapter import AsyncMultiCollectionAdapter
 
 router = MetadataFieldRouter(
     query_config=config,
@@ -78,3 +79,9 @@ The merged `ExecutionResult` contains:
 
 Refer to `tests/chromasql/test_multi_collection.py` and
 `tests/chromasql/test_or_routing_integration.py` for exhaustive behavior.
+
+<div class="grid cards" markdown>
+
+- [:material-github: **Need Help?**](https://github.com/GetAdriAI/chromasql/issues/new?title=Docs%20Issue&labels=chromasql-py){ target="_blank" }<br/>
+Open a GitHub issue with the steps to reproduce and we’ll help you debug it.
+</div>

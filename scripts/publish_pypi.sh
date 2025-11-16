@@ -14,11 +14,6 @@ for tool in python twine; do
   fi
 done
 
-if [[ -n "$(git -C "${REPO_DIR}" status --porcelain)" ]]; then
-  echo "Working tree has uncommitted changes. Commit or stash before publishing." >&2
-  exit 1
-fi
-
 VERSION="$(python - <<'PY'
 import pathlib, tomllib
 data = tomllib.loads(pathlib.Path("pyproject.toml").read_text())
@@ -28,13 +23,11 @@ PY
 
 TAG="v${VERSION}"
 
-cd "${PKG_DIR}"
+rm -rf "${PKG_DIR}/dist" "${PKG_DIR}/build" "${PKG_DIR}"/*.egg-info
 
-rm -rf dist build *.egg-info
-
-python -m build
-twine check dist/*
-twine upload dist/*
+python -m build "${PKG_DIR}"
+twine check "${PKG_DIR}/dist"/*
+twine upload "${PKG_DIR}/dist"/*
 
 if git -C "${REPO_DIR}" rev-parse "${TAG}" >/dev/null 2>&1; then
   echo "Tag ${TAG} already exists; skipping tag creation."

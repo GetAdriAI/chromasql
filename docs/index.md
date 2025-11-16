@@ -23,8 +23,25 @@ The planner and executor operate on frozen dataclasses (`chromasql/ast.py` and
 - Rich projection, filtering, ordering, pagination, and rerank clauses.
 - Embedding support for inline text, literal vectors, and batches.
 - Optional explain output for debugging query plans.
-- Multi-collection routing primitives and adapters for sharded deployments.
+- Multi-collection routing primitives and adapters for [sharded deployments](reference/glossary/#sharded-deployment).
 - 100% unit test coverage to keep language changes predictable.
 
-Use the navigation on the left to dive into the tutorial, query language
-reference, multi-collection support, and advanced extension points.
+## Next Steps
+
+Pick the path that best suits your workflow. Happy querying! 
+
+<div class="grid cards" markdown>
+
+- [:material-school: **Using ChromaSQL**](using-chromasql/tutorial/setup.md)<br/>
+  Learn the language through the narrative tutorial and clause reference.
+
+- [:material-console: **Using ChromaSQL Python Package**](using-csql-py/index.md)<br/>
+  Install the Python SDK, execute plans, and integrate multi-collection routing.
+
+- [:material-robot: **Using ChromaSQL with LLMs**](chromasql-authoring-prompt.md)<br/>
+  Drop this authoring prompt into your assistants so they emit valid queries.
+
+- [:material-puzzle: **Building Extensions**](building-extensions.md)<br/>
+  Extend the grammar, planner, executor, and packaging workflow safely.
+
+</div>

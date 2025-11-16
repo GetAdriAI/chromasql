@@ -4,16 +4,78 @@ repo_url: https://github.com/GetAdriAI/chromasql
 repo_name: GetAdriAI/chromasql
 nav:
   - Overview: index.md
-  - Getting Started: getting-started.md
-  - Query Language: query-language.md
-  - Examples: examples.md
-  - Multi-Collection: multi-collection.md
+  - Using ChromaSQL: 
+    - Tutorial: 
+      - Setup: using-chromasql/tutorial/setup.md
+      - Basics: using-chromasql/tutorial/basics.md
+      - Filtering: using-chromasql/tutorial/filtering.md
+      - Vector Search: using-chromasql/tutorial/vector-search.md
+      - Reranking and Batching: using-chromasql/tutorial/reranking-batching.md
+      - Filter-Only Retrieval: using-chromasql/tutorial/filter-only.md
+      - Explain: using-chromasql/tutorial/explain.md
+      - Limitations: using-chromasql/tutorial/limitations.md
+      - Troubleshooting: using-chromasql/tutorial/troubleshooting.md
+    - Quick Reference: using-chromasql/quick-reference.md
+  - Using ChromaSQL Python Package: 
+    - Overview: using-csql-py/index.md
+    - Getting Started: using-csql-py/getting-started.md
+    - Examples: using-csql-py/examples.md
+    - Multi-Collection: 
+      - Overview: using-csql-py/multi-collection/overview.md
+      - Examples: using-csql-py/multi-collection/EXAMPLES.md
+      - Edge Cases: using-csql-py/multi-collection/OR_ROUTING_EDGE_CASES.md
+  - Using ChromaSQL with LLMs: using-csql-llm/chromasql-prompt.md
   - Building Extensions: building-extensions.md
-  - Grammar Reference: grammar-reference.md
+  - Reference:
+    - Grammar Reference: reference/language-grammar.md
+    - Multi-Collection Architecture: reference/multi-collection-architecture.md
+    - Multi-Collection Routing Strategies: reference/routing-strategies.md
+    - Glossary: reference/glossary.md
+  
+plugins:
+  - search
+  - macros:
+      module_name: docs/main
+  
 theme:
-  name: mkdocs
+  name: material
+  custom_dir: overrides
+  features:
+    - navigation.tabs        # Adds top navigation bar
+    - navigation.indexes  # This enables bold section headers
+    - navigation.footer
+    - content.code.copy # enables the copy button in code block
+  palette:
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
 markdown_extensions:
+  - attr_list
   - admonition
   - codehilite
   - toc:
       permalink: true
+  - md_in_html
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+extra_css:
+  - assets/css/custom.css
+copyright: |
+  Powered by <a href="https://welcome.getadri.ai/" target="_blank">
+    <img src="chromasql/docs/assets/adri-ai-full-logo.png" alt="Logo">
+    Adri AI
+  </a>

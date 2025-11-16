@@ -8,11 +8,11 @@ Example: Using with AsyncMultiCollectionQueryClient
 ----------------------------------------------------
 
     from chromasql.adapters import (
-        AsyncMultiCollectionAdapter,
         MetadataFieldRouter,
     )
     from chromasql.multi_collection import execute_multi_collection
     from indexer.vectorize_lib.query_client import AsyncMultiCollectionQueryClient
+    from indexer.query_lib.async_multi_collection_adapter import AsyncMultiCollectionAdapter
 
     # Setup your existing client
     client = AsyncMultiCollectionQueryClient(
@@ -46,76 +46,9 @@ import logging
 from typing import Any, Dict, Optional, Sequence, Set
 
 from .analysis import extract_metadata_values
-from .ast import Query
+from ._ast_nodes import Query
 
 logger = logging.getLogger(__name__)
-
-
-class AsyncMultiCollectionAdapter:
-    """Adapter for AsyncMultiCollectionQueryClient.
-
-    This adapter wraps an existing ``AsyncMultiCollectionQueryClient`` to
-    implement ChromaSQL's ``AsyncCollectionProvider`` protocol. It delegates
-    collection retrieval to the underlying client and reuses its connection
-    pooling and caching.
-
-    Parameters
-    ----------
-    client:
-        An initialized AsyncMultiCollectionQueryClient instance.
-        Must be connected via ``await client.connect()`` before use.
-    """
-
-    def __init__(self, client: Any):
-        """Initialize the adapter.
-
-        Parameters
-        ----------
-        client:
-            AsyncMultiCollectionQueryClient instance (already connected).
-        """
-        self.client = client
-
-        if not hasattr(client, "_get_collection"):
-            raise TypeError(
-                "Client must be an AsyncMultiCollectionQueryClient with "
-                "_get_collection method"
-            )
-
-        if not hasattr(client, "_query_config") or client._query_config is None:
-            raise RuntimeError(
-                "Client must be connected (call await client.connect() first)"
-            )
-
-    async def get_collection(self, name: str) -> Any:
-        """Get a collection by name using the underlying client.
-
-        Parameters
-        ----------
-        name:
-            Collection name.
-
-        Returns
-        -------
-        ChromaDB collection object.
-        """
-        return await self.client._get_collection(name)
-
-    async def list_collection_names(self) -> Sequence[str]:
-        """List all available collection names from query config.
-
-        Returns
-        -------
-        Sequence[str]
-            All collection names registered in the query config.
-        """
-        config = self.client._query_config
-        if not config:
-            raise RuntimeError("Query config not loaded")
-
-        # Get all collections from the config
-        all_collections = set(config["collection_to_models"].keys())
-        return sorted(all_collections)
 
 
 class MetadataFieldRouter:
@@ -318,7 +251,6 @@ class SimpleAsyncClientAdapter:
 
 
 __all__ = [
-    "AsyncMultiCollectionAdapter",
     "MetadataFieldRouter",
     "SimpleAsyncClientAdapter",
 ]

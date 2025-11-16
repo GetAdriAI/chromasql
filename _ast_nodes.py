@@ -16,6 +16,26 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, Optional, Tuple, Union
 
+__all__ = [
+    "Field",
+    "ProjectionItem",
+    "Projection",
+    "EmbeddingText",
+    "EmbeddingVector",
+    "EmbeddingBatch",
+    "Embedding",
+    "OrderItem",
+    "Rerank",
+    "Predicate",
+    "ComparisonPredicate",
+    "InPredicate",
+    "BetweenPredicate",
+    "LikePredicate",
+    "ContainsPredicate",
+    "BooleanPredicate",
+    "Query",
+]
+
 
 @dataclass(frozen=True)
 class Field:

@@ -20,7 +20,7 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple, Union, cast
 from lark import Lark, Token, Transformer
 from lark.exceptions import VisitError
 
-from .ast import (
+from ._ast_nodes import (
     BooleanPredicate,
     ComparisonPredicate,
     ContainsPredicate,

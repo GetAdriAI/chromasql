@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import Optional, Sequence, Set, Tuple
 
-from .ast import (
+from ._ast_nodes import (
     BooleanPredicate,
     ComparisonPredicate,
     Field,
