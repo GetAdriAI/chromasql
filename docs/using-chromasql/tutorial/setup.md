@@ -4,10 +4,8 @@ Welcome! This guide shows you **every clause** the ChromaSQL DSL currently
 supports, why you might use it, and a few common pitfalls to avoid.  Follow it
 sequentially – the later sections build on the earlier ones.
 
-!!! tip 
-    ChromaSQL is read-only.  It helps you query ChromaDB collections but does not create, mutate, or delete data.  
-    
-    For ingest or management, please use ChromaDB's Python SDK or REST API.
+!!! tip
+    ChromaSQL is read-only.  It queries ChromaDB collections but does not create, mutate, or delete data.
 
 ## Demo Collection Schema
 

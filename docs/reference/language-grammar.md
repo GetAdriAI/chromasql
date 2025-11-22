@@ -52,14 +52,23 @@ embedding_batch: "BATCH" "(" embedding_batch_item ("," embedding_batch_item)* ")
 
 ```
 where_clause: "WHERE" predicate
-where_document_clause: "WHERE_DOCUMENT" document_predicate
+where_document_clause: "WHERE_DOCUMENT" document_predicate_expr
 
 predicate:
     or_expr
 
-document_predicate:
+document_predicate_expr:
+    document_or_expr
+document_or_expr:
+    document_and_expr ("OR" document_and_expr)*
+document_and_expr:
+    document_atom ("AND" document_atom)*
+document_atom:
+    | "(" document_predicate_expr ")"
     | "CONTAINS" value
     | "LIKE" string_literal
+    | "document" "CONTAINS" value
+    | "document" "LIKE" string_literal
 ```
 
 Metadata predicates support:
@@ -67,10 +76,10 @@ Metadata predicates support:
 - Comparisons (`=`, `!=`, `<`, `<=`, `>`, `>=`)
 - `IN` / `NOT IN`
 - `BETWEEN`
-- `LIKE` (`%value%` form)
-- `CONTAINS`
 
-Boolean expressions use `AND` / `OR` with parentheses for grouping.
+**Note:** `LIKE` and `CONTAINS` are only supported for document predicates (via `WHERE_DOCUMENT`), not for metadata filters. This is a ChromaDB limitation.
+
+Both `WHERE` and `WHERE_DOCUMENT` support boolean expressions with `AND` / `OR` and parentheses for grouping.
 
 ## Similarity & TopK
 

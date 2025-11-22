@@ -145,9 +145,9 @@ clause. ChromaSQL provides a generic `MetadataFieldRouter` adapter:
 from pathlib import Path
 from chromasql.adapters import MetadataFieldRouter
 from chromasql.multi_collection import execute_multi_collection
-from indexer.query_lib.async_multi_collection_adapter import AsyncMultiCollectionAdapter
-from indexer.vectorize_lib.query_client import AsyncMultiCollectionQueryClient
-from indexer.vectorize_lib.query_config import load_query_config
+from idxr.query_lib.async_multi_collection_adapter import AsyncMultiCollectionAdapter
+from idxr.vectorize_lib.query_client import AsyncMultiCollectionQueryClient
+from idxr.vectorize_lib.query_config import load_query_config
 
 # Load your query config (maps discriminator values to collections)
 config = load_query_config(Path("query_config.json"))

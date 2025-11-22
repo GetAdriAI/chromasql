@@ -20,7 +20,7 @@ in metadata:
 ```python
 from chromasql.adapters import MetadataFieldRouter
 from chromasql.multi_collection import execute_multi_collection
-from indexer.query_lib.async_multi_collection_adapter import AsyncMultiCollectionAdapter
+from idxr.query_lib.async_multi_collection_adapter import AsyncMultiCollectionAdapter
 
 router = MetadataFieldRouter(
     query_config=config,

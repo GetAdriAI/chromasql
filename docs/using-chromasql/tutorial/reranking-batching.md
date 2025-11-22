@@ -9,18 +9,8 @@ USING EMBEDDING (TEXT 'graphite pencil')
 RERANK BY MMR(lambda = 0.4, candidates = 50)
 TOPK 10;
 ```
-* MMR (Maximal Marginal Relevance) is a popular diversification strategy.  The
-  plan records the lambda / candidate values so your executor can plug in an
-  external reranker after the initial fetch.
-* Parameters are purely a hint – ChromaSQL does not run the reranker for you.
-
-!!! warning "Plan annotations only"
-    Rerank clauses just decorate the plan.  Run the reranker yourself after you
-    receive the initial results.
-
-!!! tip "Log rerank parameters"
-    Persist the lambda and candidate count with your query metadata so you can
-    reproduce production decisions when tuning the reranker later.
+* MMR (Maximal Marginal Relevance) is a popular diversification strategy.
+* The `RERANK` clause adds lambda and candidate values to the query plan metadata.
 
 
 ## Full Example with Batching, Filters, and Reranking

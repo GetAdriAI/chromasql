@@ -33,6 +33,7 @@ from ._ast_nodes import (
     InPredicate,
     BetweenPredicate,
     LikePredicate,
+    RegexPredicate,
     OrderItem,
     Predicate,
     Projection,
@@ -334,23 +335,93 @@ def _build_metadata_filter(predicate: Predicate) -> Dict[str, Any]:
         return _nest_metadata_field(predicate.field, payload)
 
     if isinstance(predicate, BetweenPredicate):
-        payload = {"$gte": predicate.lower, "$lte": predicate.upper}
-        return _nest_metadata_field(predicate.field, payload)
+        # ChromaDB limitation: Cannot use multiple operators on the same field in one filter.
+        # Instead of {"field": {"$gte": lower, "$lte": upper}} which ChromaDB rejects,
+        # we generate {"$and": [{"field": {"$gte": lower}}, {"field": {"$lte": upper}}]}
+        # Convert BETWEEN to an AND of two comparisons
+        gte_predicate = ComparisonPredicate(
+            field=predicate.field, operator=">=", value=predicate.lower
+        )
+        lte_predicate = ComparisonPredicate(
+            field=predicate.field, operator="<=", value=predicate.upper
+        )
+        and_predicate = BooleanPredicate(
+            operator="AND", predicates=(gte_predicate, lte_predicate)
+        )
+        return _build_metadata_filter(and_predicate)
 
     if isinstance(predicate, ContainsPredicate):
+        # ChromaDB limitation: $contains is not supported for metadata filters
+        if predicate.field.root == "metadata":
+            raise ChromaSQLPlanningError(
+                "CONTAINS operator is not supported on metadata fields. "
+                "ChromaDB only supports CONTAINS on document text. "
+                "Use 'WHERE_DOCUMENT CONTAINS ...' instead, or use "
+                "equality/comparison operators "
+                "(=, !=, IN, <, >, etc.) for metadata filtering."
+            )
         payload = {"$contains": predicate.value}
         return _nest_metadata_field(predicate.field, payload)
 
     if isinstance(predicate, LikePredicate):
+        # ChromaDB limitation: $contains is not supported for metadata filters
+        if predicate.field.root == "metadata":
+            raise ChromaSQLPlanningError(
+                "LIKE operator is not supported on metadata fields. "
+                "ChromaDB only supports LIKE on document text. "
+                "Use 'WHERE_DOCUMENT LIKE ...' instead, or use equality/comparison operators "
+                "(=, !=, IN, <, >, etc.) for metadata filtering."
+            )
         substring = _extract_contains_pattern(predicate.pattern)
         payload = {"$contains": substring}
         return _nest_metadata_field(predicate.field, payload)
 
+    if isinstance(predicate, RegexPredicate):
+        # ChromaDB limitation: $regex is not supported for metadata filters
+        if predicate.field.root == "metadata":
+            raise ChromaSQLPlanningError(
+                "REGEX operator is not supported on metadata fields. "
+                "ChromaDB only supports REGEX on document text. "
+                "Use 'WHERE_DOCUMENT REGEX ...' instead, or use equality/comparison operators "
+                "(=, !=, IN, <, >, etc.) for metadata filtering."
+            )
+        # If someone tries to use REGEX on document field in WHERE (not WHERE_DOCUMENT),
+        # we currently don't support it, but we could in the future
+        raise ChromaSQLPlanningError(
+            "REGEX is only supported in WHERE_DOCUMENT clauses, not in WHERE clauses"
+        )
+
     raise ChromaSQLPlanningError("Unsupported metadata predicate")
+
+
+def _validate_document_predicate(predicate: Predicate) -> None:
+    """Ensure predicate only references the document field, not metadata or other fields."""
+    if isinstance(predicate, BooleanPredicate):
+        for child in predicate.predicates:
+            _validate_document_predicate(child)
+        return
+
+    if isinstance(predicate, (ContainsPredicate, LikePredicate, RegexPredicate)):
+        if predicate.field.root != "document":
+            raise ChromaSQLPlanningError(
+                f"WHERE_DOCUMENT only supports predicates on the 'document' field. "
+                f"Found reference to '{predicate.field.root}' field instead. "
+                f"Use 'WHERE {predicate.field.root}...' for metadata filtering."
+            )
+        return
+
+    # This catches any other predicate types that shouldn't be in WHERE_DOCUMENT
+    raise ChromaSQLPlanningError(
+        "WHERE_DOCUMENT only supports CONTAINS, LIKE, and REGEX "
+        "predicates on the document field"
+    )
 
 
 def _build_document_filter(predicate: Predicate) -> Dict[str, Any]:
     """Translate document predicates into the ``where_document`` format."""
+    # Validate that predicates only reference document field
+    _validate_document_predicate(predicate)
+
     if isinstance(predicate, BooleanPredicate):
         key = "$and" if predicate.operator == "AND" else "$or"
         items = [_build_document_filter(child) for child in predicate.predicates]
@@ -359,13 +430,21 @@ def _build_document_filter(predicate: Predicate) -> Dict[str, Any]:
         return {key: items}
 
     if isinstance(predicate, ContainsPredicate):
-        return {"$contains": predicate.value}
+        operator = "$not_contains" if predicate.negated else "$contains"
+        return {operator: predicate.value}
 
     if isinstance(predicate, LikePredicate):
         substring = _extract_contains_pattern(predicate.pattern)
-        return {"$contains": substring}
+        operator = "$not_contains" if predicate.negated else "$contains"
+        return {operator: substring}
 
-    raise ChromaSQLPlanningError("Documents support CONTAINS or simple LIKE predicates")
+    if isinstance(predicate, RegexPredicate):
+        operator = "$not_regex" if predicate.negated else "$regex"
+        return {operator: predicate.pattern}
+
+    raise ChromaSQLPlanningError(
+        "Documents support CONTAINS, LIKE, and REGEX predicates"
+    )
 
 
 def _ids_from_predicate(predicate: Predicate) -> List[str]:
@@ -446,11 +525,25 @@ def _nest_metadata_field(field: Field, payload: Dict[str, Any]) -> Dict[str, Any
 
 
 def _extract_contains_pattern(pattern: str) -> str:
-    if (
-        pattern.startswith("%")
-        and pattern.endswith("%")
-        and pattern.count("%") == 2
-        and "_" not in pattern
-    ):
+    if pattern.startswith("%") and pattern.endswith("%") and pattern.count("%") == 2:
         return pattern.strip("%")
-    raise ChromaSQLPlanningError("LIKE patterns are limited to %%value%% form")
+
+    # Provide helpful error message
+    if pattern.count("%") > 2:
+        raise ChromaSQLPlanningError(
+            f"LIKE pattern '{pattern}' has too many % wildcards. "
+            "LIKE patterns require exactly two % wildcards at start and end. "
+            "Valid: '%positive pay%', '%US_POSIPAY%'. "
+            "Invalid: '%positive%pay%' (extra % in middle)."
+        )
+    elif not pattern.startswith("%") or not pattern.endswith("%"):
+        raise ChromaSQLPlanningError(
+            f"LIKE pattern '{pattern}' must start and end with %. "
+            "Valid: '%oauth%', '%Bank of America%'. "
+            "Invalid: '%oauth' (missing ending %), 'oauth%' (missing starting %)."
+        )
+    else:
+        raise ChromaSQLPlanningError(
+            f"LIKE pattern '{pattern}' is invalid. "
+            "Patterns must be in the form '%value%' with exactly two % wildcards."
+        )

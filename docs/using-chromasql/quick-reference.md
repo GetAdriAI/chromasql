@@ -33,22 +33,62 @@ omitting it produces a metadata-only `get`.
 
 ### Metadata (`WHERE`)
 
-Supports equality, inequality, numeric comparisons, `IN`/`NOT IN`, `BETWEEN`,
-`LIKE` (with `%value%` pattern), and `CONTAINS`.
+Supports equality, inequality, numeric comparisons, `IN`/`NOT IN`, and `BETWEEN`.
+
+**Note:** `LIKE` and `CONTAINS` are NOT supported on metadata (ChromaDB limitation).
+Use `WHERE_DOCUMENT` for text/pattern matching.
+
+**Note:** `BETWEEN` with mixed int/float types may behave unexpectedly due to ChromaDB type coercion. Use matching types (integer boundaries for integer metadata).
+
+**Important:** Different filter types (metadata vs. document) can **only** be combined with `AND`, not `OR` (ChromaDB limitation). Within each type, use `OR` freely.
 
 ```sql
+-- Valid: metadata AND document
 WHERE metadata.category = 'outerwear'
-  AND metadata.tags CONTAINS 'waterproof'
+  AND metadata.price BETWEEN 50 AND 150
+  AND document CONTAINS 'waterproof'
+
+-- Invalid: metadata OR document ❌
+-- WHERE metadata.category = 'outerwear' OR document CONTAINS 'sale'
 ```
 
 ### Document (`WHERE_DOCUMENT`)
 
-Applied after metadata filters. Supports `CONTAINS` and `%value%` `LIKE`
-patterns.
+Applied after metadata filters. Supports text search operators: `CONTAINS`, `NOT CONTAINS`, `LIKE`, `NOT LIKE`, `REGEX`, `NOT REGEX`.
+
+**These operators ONLY work with WHERE_DOCUMENT**, not with WHERE (metadata).
+
+**Boolean expressions supported**: Use `AND`, `OR`, and parentheses for complex filters.
+
+**Important:** Use `WHERE_DOCUMENT` **once** at the beginning, then combine predicates with boolean operators. Don't repeat `WHERE_DOCUMENT` for each condition.
 
 ```sql
+-- Simple filter
 WHERE_DOCUMENT LIKE '%gore-tex%'
+
+-- OR: Match multiple terms (don't repeat WHERE_DOCUMENT!)
+WHERE_DOCUMENT CONTAINS 'waterproof' OR CONTAINS 'breathable'
+
+-- AND: Match all terms
+WHERE_DOCUMENT CONTAINS 'outdoor' AND LIKE '%jacket%'
+
+-- Complex: Nested with parentheses
+WHERE_DOCUMENT (CONTAINS 'outdoor' AND LIKE '%jacket%') OR CONTAINS 'windproof'
+
+-- Real-world: Multiple organization names
+WHERE_DOCUMENT CONTAINS 'BofA' OR CONTAINS 'Bank of America' OR LIKE '%Wells Fargo%'
+
+-- Exclude patterns
+WHERE_DOCUMENT NOT LIKE '%test%'
+WHERE_DOCUMENT NOT CONTAINS 'deprecated'
+
+-- Regex patterns
+WHERE_DOCUMENT REGEX '[a-z]+@[a-z]+\.com'  -- Email pattern
+WHERE_DOCUMENT REGEX '(?i)python'  -- Case-insensitive matching
+WHERE_DOCUMENT NOT REGEX '\d{3}-\d{2}-\d{4}'  -- Exclude SSN patterns
 ```
+
+**Note:** Text operators are **case-sensitive**. `WHERE_DOCUMENT CONTAINS 'urgent'` will NOT match "Urgent" or "URGENT". To handle multiple cases, use OR: `CONTAINS 'urgent' OR CONTAINS 'Urgent'`, or use REGEX with `(?i)` flag: `REGEX '(?i)urgent'`.
 
 ## Embedding Clauses
 

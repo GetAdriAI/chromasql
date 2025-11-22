@@ -12,7 +12,7 @@ from typing import Any, Dict, List, Mapping, Optional, Type
 from fastapi import HTTPException
 from pydantic import BaseModel
 
-from indexer.models import CollectionEnvironment as ResearchAgentEnvironment
+from idxr.models import CollectionEnvironment
 
 try:
     from adri_agents.app.utils.uni_vectordb_agent_harness.query_executor_config import (
@@ -21,11 +21,11 @@ try:
     )
 except ImportError:
     # Fallback for standalone chromasql usage
-    from indexer.query_lib.config import (  # type: ignore[no-redef]
+    from idxr.query_lib.config import (  # type: ignore[no-redef]
         build_query_executor_kwargs,
         load_model_registry,
     )
-from indexer.query_lib.executor import QueryExecutor
+from idxr.query_lib.executor import QueryExecutor
 from chromasql.errors import (
     ChromaSQLParseError,
     ChromaSQLPlanningError,
@@ -35,7 +35,7 @@ from chromasql.errors import (
 logger = getLogger(__name__)
 
 
-# System metadata fields automatically managed by the indexer
+# System metadata fields automatically managed by the idxr
 SYSTEM_METADATA_FIELDS: tuple[tuple[str, str, str], ...] = (
     ("model_name", "string", "String"),
     ("source_path", "string", "String"),
@@ -82,7 +82,7 @@ class CollectionService:
     1. Retrieving index metadata (for /indices endpoint)
     2. Executing ChromaSQL queries (for /chromasql/execute endpoint)
 
-    It can work with any ResearchAgentEnvironment, supporting both
+    It can work with any CollectionEnvironment, supporting both
     system collections and user-created collections.
 
     Usage:
@@ -107,7 +107,7 @@ class CollectionService:
         self,
         collection_name: str,
         display_name: str,
-        system_env: ResearchAgentEnvironment,
+        system_env: CollectionEnvironment,
     ):
         """
         Initialize the collection service for a single collection.
@@ -123,13 +123,13 @@ class CollectionService:
 
     @classmethod
     def from_env_map(
-        cls, env_map: Dict[str, ResearchAgentEnvironment]
+        cls, env_map: Dict[str, CollectionEnvironment]
     ) -> "MultiCollectionService":
         """
         Create a multi-collection service from an environment map.
 
         Args:
-            env_map: Map of display_name -> ResearchAgentEnvironment
+            env_map: Map of display_name -> CollectionEnvironment
 
         Returns:
             MultiCollectionService instance managing multiple collections
@@ -477,19 +477,19 @@ class MultiCollectionService:
     methods to work with all collections at once.
     """
 
-    def __init__(self, env_map: Dict[str, ResearchAgentEnvironment]):
+    def __init__(self, env_map: Dict[str, CollectionEnvironment]):
         """
         Initialize the multi-collection service.
 
         Args:
-            env_map: Map of collection_name -> ResearchAgentEnvironment
+            env_map: Map of display_name -> CollectionEnvironment
         """
         self.services: Dict[str, CollectionService] = {}
-        for collection_name, system_env in env_map.items():
-            # Use collection_name as both internal name and display name
-            self.services[collection_name] = CollectionService(
-                collection_name=collection_name,
-                display_name=collection_name,
+        for display_name, system_env in env_map.items():
+            # Key by sanitized collection_name for API lookups, but preserve display_name
+            self.services[system_env.collection_name] = CollectionService(
+                collection_name=system_env.collection_name,
+                display_name=display_name,
                 system_env=system_env,
             )
 

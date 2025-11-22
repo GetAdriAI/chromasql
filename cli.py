@@ -136,7 +136,7 @@ def create_collection_environment_from_config(
     Raises:
         ValueError: If configuration is invalid or missing required fields
     """
-    from indexer.models import CollectionEnvironment
+    from idxr.models import CollectionEnvironment
 
     client_type = config.get("type", "").lower()
 
@@ -175,12 +175,13 @@ def create_collection_environment_from_config(
                 module_path = ".".join(rel_path.parts) + ".test_registry:MODEL_REGISTRY"
                 model_registry_target = module_path
             else:
-                model_registry_target = "indexer.registry:MODEL_REGISTRY"
+                model_registry_target = "idxr.registry:MODEL_REGISTRY"
 
         embedding_model = config.get("embedding_model", "text-embedding-3-small")
         local_collection_name = config.get("collection_name", collection_name)
 
         return CollectionEnvironment(
+            collection_name=local_collection_name,
             query_config_path=query_config_path,
             discriminator_field=discriminator_field,
             model_registry_target=model_registry_target,
@@ -214,11 +215,18 @@ def create_collection_environment_from_config(
 
         discriminator_field = config.get("discriminator_field", "model_name")
         model_registry_target = config.get(
-            "model_registry_target", "indexer.registry:MODEL_REGISTRY"
+            "model_registry_target", "idxr.registry:MODEL_REGISTRY"
         )
         embedding_model = config.get("embedding_model", "text-embedding-3-small")
 
+        # For cloud collections, use database name as collection_name or
+        # fallback to provided name
+        cloud_collection_name = config.get(
+            "collection_name", database or collection_name
+        )
+
         return CollectionEnvironment(
+            collection_name=cloud_collection_name,
             query_config_path=query_config_path,
             discriminator_field=discriminator_field,
             model_registry_target=model_registry_target,

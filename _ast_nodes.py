@@ -32,6 +32,7 @@ __all__ = [
     "BetweenPredicate",
     "LikePredicate",
     "ContainsPredicate",
+    "RegexPredicate",
     "BooleanPredicate",
     "Query",
 ]
@@ -136,12 +137,21 @@ class BetweenPredicate(Predicate):
 class LikePredicate(Predicate):
     field: Field
     pattern: str
+    negated: bool = False
 
 
 @dataclass(frozen=True)
 class ContainsPredicate(Predicate):
     field: Field
     value: Union[str, int, float, bool]
+    negated: bool = False
+
+
+@dataclass(frozen=True)
+class RegexPredicate(Predicate):
+    field: Field
+    pattern: str
+    negated: bool = False
 
 
 @dataclass(frozen=True)

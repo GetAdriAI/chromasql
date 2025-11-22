@@ -11,8 +11,8 @@ Example: Using with AsyncMultiCollectionQueryClient
         MetadataFieldRouter,
     )
     from chromasql.multi_collection import execute_multi_collection
-    from indexer.vectorize_lib.query_client import AsyncMultiCollectionQueryClient
-    from indexer.query_lib.async_multi_collection_adapter import AsyncMultiCollectionAdapter
+    from idxr.vectorize_lib.query_client import AsyncMultiCollectionQueryClient
+    from idxr.query_lib.async_multi_collection_adapter import AsyncMultiCollectionAdapter
 
     # Setup your existing client
     client = AsyncMultiCollectionQueryClient(

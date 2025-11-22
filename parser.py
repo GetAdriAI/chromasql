@@ -33,6 +33,7 @@ from ._ast_nodes import (
     InPredicate,
     BetweenPredicate,
     LikePredicate,
+    RegexPredicate,
     OrderItem,
     Predicate,
     Projection,
@@ -282,6 +283,46 @@ class _ChromaSQLTransformer(Transformer):
         [pattern] = items
         return LikePredicate(field=Field("document"), pattern=pattern)
 
+    def contains_explicit_field(self, items: List[Any]) -> ContainsPredicate:
+        [value] = items
+        return ContainsPredicate(field=Field("document"), value=value)
+
+    def like_explicit_field(self, items: List[Any]) -> LikePredicate:
+        [pattern] = items
+        return LikePredicate(field=Field("document"), pattern=pattern)
+
+    def document_not_contains(self, items: List[Any]) -> ContainsPredicate:
+        [value] = items
+        return ContainsPredicate(field=Field("document"), value=value, negated=True)
+
+    def document_not_like(self, items: List[Any]) -> LikePredicate:
+        [pattern] = items
+        return LikePredicate(field=Field("document"), pattern=pattern, negated=True)
+
+    def document_regex(self, items: List[Any]) -> RegexPredicate:
+        [pattern] = items
+        return RegexPredicate(field=Field("document"), pattern=pattern)
+
+    def document_not_regex(self, items: List[Any]) -> RegexPredicate:
+        [pattern] = items
+        return RegexPredicate(field=Field("document"), pattern=pattern, negated=True)
+
+    def not_contains_explicit_field(self, items: List[Any]) -> ContainsPredicate:
+        [value] = items
+        return ContainsPredicate(field=Field("document"), value=value, negated=True)
+
+    def not_like_explicit_field(self, items: List[Any]) -> LikePredicate:
+        [pattern] = items
+        return LikePredicate(field=Field("document"), pattern=pattern, negated=True)
+
+    def regex_explicit_field(self, items: List[Any]) -> RegexPredicate:
+        [pattern] = items
+        return RegexPredicate(field=Field("document"), pattern=pattern)
+
+    def not_regex_explicit_field(self, items: List[Any]) -> RegexPredicate:
+        [pattern] = items
+        return RegexPredicate(field=Field("document"), pattern=pattern, negated=True)
+
     def or_expr(self, items: List[Predicate]) -> Predicate:
         return _combine_boolean("OR", items)
 
@@ -333,6 +374,36 @@ class _ChromaSQLTransformer(Transformer):
         if not isinstance(field, Field):
             raise ChromaSQLParseError("CONTAINS clause left side must be a field")
         return ContainsPredicate(field=field, value=value)
+
+    def not_like(self, items: List[Any]) -> LikePredicate:
+        field, pattern = items
+        if not isinstance(field, Field):
+            raise ChromaSQLParseError("NOT LIKE clause left side must be a field")
+        if not isinstance(pattern, str):
+            raise ChromaSQLParseError("NOT LIKE clause requires a string literal")
+        return LikePredicate(field=field, pattern=pattern, negated=True)
+
+    def not_contains(self, items: List[Any]) -> ContainsPredicate:
+        field, value = items
+        if not isinstance(field, Field):
+            raise ChromaSQLParseError("NOT CONTAINS clause left side must be a field")
+        return ContainsPredicate(field=field, value=value, negated=True)
+
+    def regex(self, items: List[Any]) -> RegexPredicate:
+        field, pattern = items
+        if not isinstance(field, Field):
+            raise ChromaSQLParseError("REGEX clause left side must be a field")
+        if not isinstance(pattern, str):
+            raise ChromaSQLParseError("REGEX clause requires a string literal")
+        return RegexPredicate(field=field, pattern=pattern)
+
+    def not_regex(self, items: List[Any]) -> RegexPredicate:
+        field, pattern = items
+        if not isinstance(field, Field):
+            raise ChromaSQLParseError("NOT REGEX clause left side must be a field")
+        if not isinstance(pattern, str):
+            raise ChromaSQLParseError("NOT REGEX clause requires a string literal")
+        return RegexPredicate(field=field, pattern=pattern, negated=True)
 
     def comp_op(self, items: List[Token]) -> str:
         [token] = items

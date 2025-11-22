@@ -14,6 +14,8 @@ from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
+from .collection_service import MultiCollectionService
+
 logger = logging.getLogger(__name__)
 
 
@@ -50,7 +52,9 @@ class CollectionMetadata(BaseModel):
     system_fields: List[Dict[str, str]]
 
 
-def create_chromasql_router(multi_collection_service: Any) -> APIRouter:
+def create_chromasql_router(
+    multi_collection_service: MultiCollectionService,
+) -> APIRouter:
     """
     Create a FastAPI router with ChromaSQL endpoints.
 
@@ -109,7 +113,7 @@ def create_chromasql_router(multi_collection_service: Any) -> APIRouter:
 
 
 def create_chromasql_app(
-    multi_collection_service: Any,
+    multi_collection_service: MultiCollectionService,
     *,
     cors_allow_origins: List[str] | None = None,
     cors_allow_methods: List[str] | None = None,

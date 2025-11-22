@@ -235,7 +235,7 @@ The CLI provides a similar developer experience to the factory pattern in `adri_
 
 ### Import Errors
 
-If you see import errors related to `indexer` or `adri_agents`:
+If you see import errors related to `idxr` or `adri_agents`:
 
 - Make sure you're running the CLI from the main project: `poetry run chromasql-server`
 - Ensure all dependencies are installed: `poetry install`

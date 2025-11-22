@@ -5,8 +5,8 @@
 | `ChromaSQLParseError: Unexpected token` | Typo in your query, or clause order incorrect (e.g. `WHERE_DOCUMENT` before `WHERE`). |
 | `ChromaSQLPlanningError: TOPK can only be used with EMBEDDING queries` | You forgot the `USING EMBEDDING` clause. |
 | Distances missing in results | You ran a filter-only query or dropped `distance` from the projection. |
-| Batch query returns unexpected duplicates | Remember that `TOPK` applies per batch item; dedupe in post-processing if needed. |
-| Rerank hint seemingly ignored | The executor returns the hint in the plan; you still need to implement the MMR reranker. |
+| Batch query returns unexpected duplicates | `TOPK` applies per batch item; results may contain duplicates across batch items. |
+| Rerank hint not affecting results | `RERANK` clauses add metadata to the query plan for downstream processing. |
 
 If you bump into behaviour that feels surprising or want to propose a language
 extension, check out `CONTRIBUTING.md` for instructions on how to get involved.

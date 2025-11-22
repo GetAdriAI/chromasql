@@ -44,9 +44,27 @@ vector_embedding: "VECTOR"i "[" vector_list? "]" -> embedding_vector
 vector_list: number_literal ("," number_literal)* -> vector_list
 
 where_clause: "WHERE"i predicate -> where_clause
-where_document_clause: "WHERE_DOCUMENT"i document_predicate -> where_document_clause
-document_predicate: "CONTAINS"i value -> document_contains
-                   | "LIKE"i string_literal -> document_like
+where_document_clause: "WHERE_DOCUMENT"i document_predicate_expr -> where_document_clause
+
+?document_predicate_expr: document_or_expr
+?document_or_expr: document_and_expr ("OR"i document_and_expr)* -> or_expr
+?document_and_expr: document_atom ("AND"i document_atom)* -> and_expr
+
+?document_atom: "(" document_predicate_expr ")" -> grouped_predicate
+              | document_simple_predicate
+
+?document_simple_predicate: "NOT"i "CONTAINS"i value -> document_not_contains
+                          | "NOT"i "LIKE"i string_literal -> document_not_like
+                          | "NOT"i "REGEX"i string_literal -> document_not_regex
+                          | "CONTAINS"i value -> document_contains
+                          | "LIKE"i string_literal -> document_like
+                          | "REGEX"i string_literal -> document_regex
+                          | "document"i "NOT"i "CONTAINS"i value -> not_contains_explicit_field
+                          | "document"i "NOT"i "LIKE"i string_literal -> not_like_explicit_field
+                          | "document"i "NOT"i "REGEX"i string_literal -> not_regex_explicit_field
+                          | "document"i "CONTAINS"i value -> contains_explicit_field
+                          | "document"i "LIKE"i string_literal -> like_explicit_field
+                          | "document"i "REGEX"i string_literal -> regex_explicit_field
 
 similarity_clause: "SIMILARITY"i similarity_value -> similarity_clause
 similarity_value: "COSINE"i -> similarity_cosine
@@ -85,8 +103,12 @@ threshold_clause: "WITH"i "SCORE"i "THRESHOLD"i number_literal -> threshold_clau
            | filter_field "IN"i "(" value_list ")" -> in_list
            | filter_field "NOT"i "IN"i "(" value_list ")" -> not_in_list
            | filter_field "BETWEEN"i value "AND"i value -> between
+           | filter_field "NOT"i "LIKE"i string_literal -> not_like
+           | filter_field "NOT"i "CONTAINS"i value -> not_contains
+           | filter_field "NOT"i "REGEX"i string_literal -> not_regex
            | filter_field "LIKE"i string_literal -> like
            | filter_field "CONTAINS"i value -> contains
+           | filter_field "REGEX"i string_literal -> regex
 
 COMP_OP: "=" | "!=" | "<" | "<=" | ">" | ">="
 comp_op: COMP_OP
