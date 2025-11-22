@@ -1,0 +1,17 @@
+.md-footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 100;
+    flex-shrink: 0;
+}
+
+.md-main {
+    padding-bottom: 2rem;
+}
+
+.md-footer__title .md-ellipsis {
+    white-space: nowrap;
+    overflow: visible;
+    text-overflow: clip;
+    max-width: none;
+}
