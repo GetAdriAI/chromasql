@@ -86,7 +86,7 @@ router = MetadataFieldRouter(config, field_path=("org", "region"))
 - Keeps routing logic separate from query execution
 - Easy to test in isolation
 
-**Code Reference:** [chromasql/analysis.py](chromasql/analysis.py)
+**Code Reference:** [chromasql/analysis.py](https://github.com/GetAdriAI/chromasql/blob/main/analysis.py)
 
 ### ✅ Protocol-Based Extensibility
 
@@ -126,7 +126,7 @@ class CollectionRouter(Protocol):
 - LIMIT/OFFSET should apply to final merged results, not per-collection
 - ORDER BY may include multiple fields (e.g., `ORDER BY metadata.year DESC, distance ASC`)
 
-**Implementation:** [chromasql/multi_collection.py:350-390](chromasql/multi_collection.py#L350-L390)
+**Implementation:** [chromasql/multi_collection.py](https://github.com/GetAdriAI/chromasql/blob/main/multi_collection.py)
 
 ## Integration with Your Setup
 

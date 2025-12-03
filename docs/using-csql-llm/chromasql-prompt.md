@@ -1,4 +1,4 @@
-# ChromaSQL Authoring Prompt
+# Prompt Template for ChromaSQL
 
 Embed this prompt when you want an agent or LLM to produce **ChromaSQL** statements that execute cleanly against ChromaDB collections. It captures the guardrails our runtime expects such as supported clause order, filtering rules, and multi-collection constraints.
 

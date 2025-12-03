@@ -5,6 +5,24 @@
     flex-shrink: 0;
 }
 
+.md-footer-copyright {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    max-width: 100%;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+@media (max-width: 600px) {
+    .md-footer-copyright {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+    }
+}
+
 .md-main {
     padding-bottom: 2rem;
 }

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "chromasql"
-version = "1.4.0"
+version = "1.8.0"
 description = "SQL-like DSL for planning and executing scoped ChromaDB queries."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -26,6 +26,7 @@ classifiers = [
   "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 dependencies = [
+  "idxr>=1.6.0,<2.0.0",
   "lark>=1.2,<2.0",
   "fastapi>=0.100.0",
   "uvicorn>=0.23.0",
@@ -41,11 +42,8 @@ Documentation = "https://getadriai.github.io/chromasql"
 [project.scripts]
 chromasql-server = "chromasql.cli:main"
 
-[tool.setuptools]
-packages = ["chromasql"]
-
-[tool.setuptools.package-dir]
-chromasql = "."
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [dependency-groups]
 dev = [

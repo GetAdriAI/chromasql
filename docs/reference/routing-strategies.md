@@ -440,7 +440,7 @@ This helps users understand query performance and optimize their queries accordi
 
 ### Extraction Algorithm
 
-The `extract_metadata_values()` function in [chromasql/analysis.py](analysis.py):
+The `extract_metadata_values()` function in [chromasql/analysis.py](https://github.com/GetAdriAI/chromasql/blob/main/analysis.py):
 
 ```python
 def _collect_metadata_values(predicate: Predicate, path: Tuple[str, ...]) -> Set[str]:
@@ -486,7 +486,7 @@ def _collect_metadata_values(predicate: Predicate, path: Tuple[str, ...]) -> Set
 
 ### Router Logic
 
-The `MetadataFieldRouter` in [chromasql/adapters.py](adapters.py):
+The `MetadataFieldRouter` in [chromasql/adapters.py](https://github.com/GetAdriAI/chromasql/blob/main/adapters.py):
 
 1. Calls `extract_metadata_values()` to get discriminator values
 2. Maps each value to collections via `query_config`
@@ -673,19 +673,9 @@ WHERE metadata.model = 'Table' AND metadata.has_sem = FALSE
 ## References
 
 ### Source Code
-- [chromasql/analysis.py](analysis.py) - Metadata value extraction
-- [chromasql/adapters.py](adapters.py) - MetadataFieldRouter implementation
-- [chromasql/multi_collection.py](multi_collection.py) - Multi-collection execution
-
-### Documentation
-- [TUTORIAL.md](TUTORIAL.md) - ChromaSQL syntax reference
-- [EXAMPLES.md](EXAMPLES.md) - Multi-collection usage examples
-- [CONTRIBUTING.md](CONTRIBUTING.md) - Architecture details
-
-### Tests
-- [tests/chromasql/test_or_routing.py](../tests/chromasql/test_or_routing.py) - Unit tests
-- [tests/chromasql/test_or_routing_integration.py](../tests/chromasql/test_or_routing_integration.py) - Integration tests
-- [tests/chromasql/test_multi_collection.py](../tests/chromasql/test_multi_collection.py) - Execution tests
+- [chromasql/analysis.py](https://github.com/GetAdriAI/chromasql/blob/main/analysis.py) - Metadata value extraction
+- [chromasql/adapters.py](https://github.com/GetAdriAI/chromasql/blob/main/adapters.py) - MetadataFieldRouter implementation
+- [chromasql/multi_collection.py](https://github.com/GetAdriAI/chromasql/blob/main/multi_collection.py) - Multi-collection execution
 
 ---
 

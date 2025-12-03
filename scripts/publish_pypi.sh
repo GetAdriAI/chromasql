@@ -14,6 +14,9 @@ for tool in python twine; do
   fi
 done
 
+# Change to package directory first
+cd "${PKG_DIR}"
+
 VERSION="$(python - <<'PY'
 import pathlib, tomllib
 data = tomllib.loads(pathlib.Path("pyproject.toml").read_text())
@@ -23,11 +26,11 @@ PY
 
 TAG="v${VERSION}"
 
-rm -rf "${PKG_DIR}/dist" "${PKG_DIR}/build" "${PKG_DIR}"/*.egg-info
+rm -rf dist build *.egg-info src/*.egg-info
 
-python -m build "${PKG_DIR}"
-twine check "${PKG_DIR}/dist"/*
-twine upload "${PKG_DIR}/dist"/*
+python -m build
+twine check dist/*
+twine upload dist/*
 
 if git -C "${REPO_DIR}" rev-parse "${TAG}" >/dev/null 2>&1; then
   echo "Tag ${TAG} already exists; skipping tag creation."

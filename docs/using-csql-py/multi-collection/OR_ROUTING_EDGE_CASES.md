@@ -285,7 +285,7 @@ WHERE metadata.model = 'Table' AND metadata.has_sem = FALSE
 
 ### How Union Extraction Works
 
-The `extract_metadata_values()` function in [chromasql/analysis.py](analysis.py) uses recursive traversal:
+The `extract_metadata_values()` function in [chromasql/analysis.py](https://github.com/GetAdriAI/chromasql/blob/main/analysis.py) uses recursive traversal:
 
 1. **BooleanPredicate (OR)**: Recursively collect values from all children
 2. **BooleanPredicate (AND)**: Recursively collect values from all children (may be nested in OR)
@@ -295,7 +295,7 @@ The `extract_metadata_values()` function in [chromasql/analysis.py](analysis.py)
 
 ### Router Logic
 
-The `MetadataFieldRouter` in [chromasql/adapters.py](adapters.py):
+The `MetadataFieldRouter` in [chromasql/adapters.py](https://github.com/GetAdriAI/chromasql/blob/main/adapters.py):
 
 1. Calls `extract_metadata_values()` to get discriminator values
 2. Maps each value to its collections via `query_config`
@@ -421,17 +421,11 @@ Potential improvements (not currently implemented):
 
 ## References
 
-- [chromasql/analysis.py](analysis.py) - Metadata value extraction
-- [chromasql/adapters.py](adapters.py) - MetadataFieldRouter implementation
+- [chromasql/analysis.py](https://github.com/GetAdriAI/chromasql/blob/main/analysis.py) - Metadata value extraction
+- [chromasql/adapters.py](https://github.com/GetAdriAI/chromasql/blob/main/adapters.py) - MetadataFieldRouter implementation
 - [chromasql/EXAMPLES.md](EXAMPLES.md) - Multi-collection usage examples
-- [tests/chromasql/test_or_routing.py](../tests/chromasql/test_or_routing.py) - Unit tests
-- [tests/chromasql/test_or_routing_integration.py](../tests/chromasql/test_or_routing_integration.py) - Integration tests
 
 ---
-
-**Last Updated:** 2025-01-01
-**Test Coverage:** 22/22 tests passing
-**Total Test Count:** 151 (chromasql + query_lib)
 
 <div class="grid cards" markdown>
 

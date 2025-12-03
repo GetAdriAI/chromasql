@@ -579,9 +579,9 @@ The key insight: The router determines **which collections to query**, but each 
 ---
 
 For more information, see:
-- [CONTRIBUTING.md](CONTRIBUTING.md) for architecture details
-- [TUTORIAL.md](TUTORIAL.md) for ChromaSQL syntax reference
-- [chromasql/multi_collection.py](multi_collection.py) for API documentation
+- [CONTRIBUTING.md](https://github.com/GetAdriAI/chromasql/blob/main/CONTRIBUTING.md) for architecture details
+- [Build Your First Query](../../using-chromasql/tutorial/basics.md) for ChromaSQL syntax reference
+- [chromasql/multi_collection.py](https://github.com/GetAdriAI/chromasql/blob/main/multi_collection.py) for API documentation
 
 <div class="grid cards" markdown>
 

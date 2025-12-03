@@ -14,17 +14,10 @@ from pydantic import BaseModel
 
 from idxr.models import CollectionEnvironment
 
-try:
-    from adri_agents.app.utils.uni_vectordb_agent_harness.query_executor_config import (
-        build_query_executor_kwargs,
-        load_model_registry,
-    )
-except ImportError:
-    # Fallback for standalone chromasql usage
-    from idxr.query_lib.config import (  # type: ignore[no-redef]
-        build_query_executor_kwargs,
-        load_model_registry,
-    )
+from idxr.query_lib.config import (  # type: ignore[no-redef]
+    build_query_executor_kwargs,
+    load_model_registry,
+)
 from idxr.query_lib.executor import QueryExecutor
 from chromasql.errors import (
     ChromaSQLParseError,
@@ -500,7 +493,7 @@ class MultiCollectionService:
         Returns:
             List of collection metadata dictionaries
         """
-        metadata_list = []
+        metadata_list: List[Dict[str, Any]] = []
         for service in self.services.values():
             metadata = service.get_collection_metadata()
             metadata_list.append(metadata.model_dump())
