@@ -1,0 +1,3597 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="SQL-like DSL for querying ChromaDB collections.">
+      
+      
+      
+      
+        <link rel="prev" href="../multi-collection-architecture/">
+      
+      
+        <link rel="next" href="../glossary/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.0">
+    
+    
+      
+        <title>Multi-Collection Routing Strategies - ChromaSQL Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.618322db.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/css/custom.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#multi-collection-routing-playbook" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="ChromaSQL Documentation" class="md-header__button md-logo" aria-label="ChromaSQL Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            ChromaSQL Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Multi-Collection Routing Strategies
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/GetAdriAI/chromasql" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GetAdriAI/chromasql
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Overview
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../using-chromasql/tutorial/setup/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Using ChromaSQL
+
+        </a>
+      </li>
+    
+  
+
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../using-csql-py/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Using ChromaSQL Python Package
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../using-csql-llm/chromasql-prompt/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Using ChromaSQL with LLMs
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../building-extensions/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Building Extensions
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../language-grammar/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="ChromaSQL Documentation" class="md-nav__button md-logo" aria-label="ChromaSQL Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    ChromaSQL Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/GetAdriAI/chromasql" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GetAdriAI/chromasql
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Using ChromaSQL
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Using ChromaSQL
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_1" id="__nav_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorial
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Tutorial
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../using-chromasql/tutorial/setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../using-chromasql/tutorial/basics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../using-chromasql/tutorial/filtering/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Filtering
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../using-chromasql/tutorial/vector-search/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Vector Search
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../using-chromasql/tutorial/reranking-batching/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reranking and Batching
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../using-chromasql/tutorial/filter-only/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Filter-Only Retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../using-chromasql/tutorial/explain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Explain
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../using-chromasql/tutorial/limitations/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Limitations
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../using-chromasql/tutorial/troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../using-chromasql/quick-reference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../using-csql-py/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Using ChromaSQL Python Package
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Using ChromaSQL Python Package
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../using-csql-py/getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../using-csql-py/examples/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Examples
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-Collection
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Multi-Collection
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../using-csql-py/multi-collection/overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../using-csql-py/multi-collection/EXAMPLES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Examples
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../using-csql-py/multi-collection/OR_ROUTING_EDGE_CASES/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Edge Cases
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../using-csql-llm/chromasql-prompt/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Using ChromaSQL with LLMs
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../building-extensions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building Extensions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../language-grammar/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Grammar Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../multi-collection-architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-Collection Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-Collection Routing Strategies
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Multi-Collection Routing Strategies
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table of Contents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#core-principles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Principles
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How It Works
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#routing-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Routing Strategies
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Routing Strategies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-single-discriminator-value-optimal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Single Discriminator Value (Optimal)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-multiple-discriminator-values-union" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Multiple Discriminator Values (Union)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-and-with-discriminator-restrictive" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. AND with Discriminator (Restrictive)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-or-with-all-discriminators-union" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. OR with All Discriminators (Union)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-or-with-missing-discriminator-conservative-fallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. OR with Missing Discriminator (Conservative Fallback)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-no-discriminator-fallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. No Discriminator (Fallback)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#or-predicate-routing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OR Predicate Routing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="OR Predicate Routing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-or-rule" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The OR Rule
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#edge-cases-catalog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Edge Cases Catalog
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Edge Cases Catalog">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-simple-or-with-same-field" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Simple OR with Same Field ✅
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-or-with-different-fields-triggers-fallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. OR with Different Fields (Triggers Fallback) ⚠️
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-or-with-nested-and" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. OR with Nested AND ✅
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-multiple-or-branches-with-and" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Multiple OR Branches with AND ✅
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-deeply-nested-orand" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Deeply Nested OR/AND ✅
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-or-with-partial-discriminators-triggers-fallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. OR with Partial Discriminators (Triggers Fallback) ⚠️
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-complex-andor-within-and-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Complex AND/OR Within AND Context ✅
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-deduplication-of-overlapping-collections" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Deduplication of Overlapping Collections ✅
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#or-routing-summary-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OR Routing Summary Table
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optimization-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optimization Analysis
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Optimization Analysis">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#research-question" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Research Question
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-cases-analyzed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Cases Analyzed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#algorithm-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Algorithm Rules
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Algorithm Rules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rule-1-or-rule-conservative" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule 1: OR Rule (Conservative)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rule-2-and-rule-optimistic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule 2: AND Rule (Optimistic)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-this-is-optimal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why This Is Optimal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rejected-optimizations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rejected Optimizations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Rejected Optimizations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#partial-or-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ❌ Partial OR Optimization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cost-based-fallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ❌ Cost-Based Fallback
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#smart-or-pruning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ❌ Smart OR Pruning
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#conclusion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conclusion
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recommended-enhancement-logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recommended Enhancement: Logging
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Details
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementation Details">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#extraction-algorithm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extraction Algorithm
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#router-logic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Router Logic
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#query-config-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query Config Format
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-guide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Guide
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Performance Guide">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query-optimization-tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query Optimization Tips
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Query Optimization Tips">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#do-use-discriminators-in-where" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ DO: Use discriminators in WHERE
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#do-use-or-with-discriminators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ DO: Use OR with discriminators
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#do-use-in-for-multiple-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ DO: Use IN for multiple values
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#caution-or-without-discriminator-triggers-fallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ CAUTION: OR without discriminator triggers fallback
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#caution-no-discriminator-full-scan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ CAUTION: No discriminator = full scan
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Matrix
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance-monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Monitoring
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing &amp; Coverage
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing &amp; Coverage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#test-organization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Organization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#coverage-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Coverage Summary
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#anti-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Anti-Patterns
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Anti-Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#partial-routing-for-mixed-or" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ❌ Partial Routing for Mixed OR
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#correct-pattern-use-and-for-specificity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Correct Pattern: Use AND for Specificity
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="References">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#source-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Source Code
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../glossary/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Glossary
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#table-of-contents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table of Contents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#core-principles" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Principles
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How It Works
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#routing-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Routing Strategies
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Routing Strategies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-single-discriminator-value-optimal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Single Discriminator Value (Optimal)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-multiple-discriminator-values-union" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Multiple Discriminator Values (Union)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-and-with-discriminator-restrictive" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. AND with Discriminator (Restrictive)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-or-with-all-discriminators-union" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. OR with All Discriminators (Union)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-or-with-missing-discriminator-conservative-fallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. OR with Missing Discriminator (Conservative Fallback)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-no-discriminator-fallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. No Discriminator (Fallback)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#or-predicate-routing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OR Predicate Routing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="OR Predicate Routing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-or-rule" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The OR Rule
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#edge-cases-catalog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Edge Cases Catalog
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Edge Cases Catalog">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-simple-or-with-same-field" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Simple OR with Same Field ✅
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-or-with-different-fields-triggers-fallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. OR with Different Fields (Triggers Fallback) ⚠️
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-or-with-nested-and" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. OR with Nested AND ✅
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-multiple-or-branches-with-and" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Multiple OR Branches with AND ✅
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-deeply-nested-orand" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Deeply Nested OR/AND ✅
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6-or-with-partial-discriminators-triggers-fallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. OR with Partial Discriminators (Triggers Fallback) ⚠️
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-complex-andor-within-and-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Complex AND/OR Within AND Context ✅
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8-deduplication-of-overlapping-collections" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Deduplication of Overlapping Collections ✅
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#or-routing-summary-table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OR Routing Summary Table
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optimization-analysis" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optimization Analysis
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Optimization Analysis">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#research-question" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Research Question
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-cases-analyzed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Cases Analyzed
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#algorithm-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Algorithm Rules
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Algorithm Rules">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rule-1-or-rule-conservative" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule 1: OR Rule (Conservative)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rule-2-and-rule-optimistic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rule 2: AND Rule (Optimistic)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-this-is-optimal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why This Is Optimal
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rejected-optimizations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Rejected Optimizations
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Rejected Optimizations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#partial-or-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ❌ Partial OR Optimization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cost-based-fallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ❌ Cost-Based Fallback
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#smart-or-pruning" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ❌ Smart OR Pruning
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#conclusion" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conclusion
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recommended-enhancement-logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recommended Enhancement: Logging
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Implementation Details
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementation Details">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#extraction-algorithm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Extraction Algorithm
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#router-logic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Router Logic
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#query-config-format" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query Config Format
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-guide" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Guide
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Performance Guide">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#query-optimization-tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Query Optimization Tips
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Query Optimization Tips">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#do-use-discriminators-in-where" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ DO: Use discriminators in WHERE
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#do-use-or-with-discriminators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ DO: Use OR with discriminators
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#do-use-in-for-multiple-values" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ DO: Use IN for multiple values
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#caution-or-without-discriminator-triggers-fallback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ CAUTION: OR without discriminator triggers fallback
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#caution-no-discriminator-full-scan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ⚠️ CAUTION: No discriminator = full scan
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance-matrix" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Matrix
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#performance-monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance Monitoring
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-coverage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing &amp; Coverage
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing &amp; Coverage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#test-organization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Organization
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#coverage-summary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Coverage Summary
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#running-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#anti-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Anti-Patterns
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Anti-Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#partial-routing-for-mixed-or" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ❌ Partial Routing for Mixed OR
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#correct-pattern-use-and-for-specificity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ✅ Correct Pattern: Use AND for Specificity
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#references" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        References
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="References">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#source-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Source Code
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="multi-collection-routing-playbook">Multi-Collection Routing Playbook<a class="headerlink" href="#multi-collection-routing-playbook" title="Permanent link">&para;</a></h1>
+<p>This document provides comprehensive coverage of ChromaSQL's multi-collection routing strategies, including implementation details, edge cases, optimization analysis, and best practices.</p>
+<h2 id="table-of-contents">Table of Contents<a class="headerlink" href="#table-of-contents" title="Permanent link">&para;</a></h2>
+<ol>
+<li><a href="#overview">Overview</a></li>
+<li><a href="#routing-strategies">Routing Strategies</a></li>
+<li><a href="#or-predicate-routing">OR Predicate Routing</a></li>
+<li><a href="#optimization-analysis">Optimization Analysis</a></li>
+<li><a href="#implementation-details">Implementation Details</a></li>
+<li><a href="#performance-guide">Performance Guide</a></li>
+<li><a href="#testing--coverage">Testing &amp; Coverage</a></li>
+</ol>
+<hr />
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p>ChromaSQL's routing system determines which collections to query based on metadata discriminator fields in the WHERE clause. The goal is to <strong>maximize query efficiency while guaranteeing zero under-routing</strong>.</p>
+<h3 id="core-principles">Core Principles<a class="headerlink" href="#core-principles" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Zero Under-Routing</strong>: Never miss results because a collection wasn't queried</li>
+<li><strong>Maximum Efficiency</strong>: Query the minimum set of collections needed for correctness</li>
+<li><strong>Simplicity</strong>: Use clear, verifiable rules that are easy to reason about</li>
+</ol>
+<h3 id="how-it-works">How It Works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Query → Parser → Planner → Router → Collections
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>                              ↓
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>                    extract_metadata_values()
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>                              ↓
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>                    {discriminator values} or None
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>                              ↓
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>                    Map to collections via query_config
+</code></pre></div>
+<hr />
+<h2 id="routing-strategies">Routing Strategies<a class="headerlink" href="#routing-strategies" title="Permanent link">&para;</a></h2>
+<h3 id="1-single-discriminator-value-optimal">1. Single Discriminator Value (Optimal)<a class="headerlink" href="#1-single-discriminator-value-optimal" title="Permanent link">&para;</a></h3>
+<p><strong>Query:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Table&#39;</span>
+</code></pre></div></p>
+<p><strong>Routing:</strong>
+- Extracts: <code>{'Table'}</code>
+- Routes to: Collections containing 'Table' (~2-3 out of 37)
+- <strong>Performance</strong>: Best case ⚡</p>
+<hr />
+<h3 id="2-multiple-discriminator-values-union">2. Multiple Discriminator Values (Union)<a class="headerlink" href="#2-multiple-discriminator-values-union" title="Permanent link">&para;</a></h3>
+<p><strong>Query:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="s1">&#39;Table&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;Field&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;View&#39;</span><span class="p">)</span>
+</code></pre></div></p>
+<p><strong>Routing:</strong>
+- Extracts: <code>{'Table', 'Field', 'View'}</code>
+- Routes to: Union of collections for all three models (~6-9 out of 37)
+- <strong>Performance</strong>: Very efficient ⚡⚡</p>
+<hr />
+<h3 id="3-and-with-discriminator-restrictive">3. AND with Discriminator (Restrictive)<a class="headerlink" href="#3-and-with-discriminator-restrictive" title="Permanent link">&para;</a></h3>
+<p><strong>Query:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Table&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;active&#39;</span>
+</code></pre></div></p>
+<p><strong>Routing:</strong>
+- Extracts: <code>{'Table'}</code>
+- Routes to: Collections for 'Table'
+- <strong>Key Insight</strong>: AND restricts scope, only discriminator values matter
+- <strong>Performance</strong>: Optimal ⚡</p>
+<hr />
+<h3 id="4-or-with-all-discriminators-union">4. OR with All Discriminators (Union)<a class="headerlink" href="#4-or-with-all-discriminators-union" title="Permanent link">&para;</a></h3>
+<p><strong>Query:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">WHERE</span><span class="w"> </span><span class="p">(</span><span class="n">metadata</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Table&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="k">system</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;S4&#39;</span><span class="p">)</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">      </span><span class="k">OR</span><span class="w"> </span><span class="p">(</span><span class="n">metadata</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Field&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">required</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">TRUE</span><span class="p">)</span>
+</code></pre></div></p>
+<p><strong>Routing:</strong>
+- Extracts: <code>{'Table', 'Field'}</code>
+- Routes to: Union of collections for Table and Field
+- <strong>Key Insight</strong>: All OR branches have discriminators → efficient union
+- <strong>Performance</strong>: Efficient ⚡⚡</p>
+<hr />
+<h3 id="5-or-with-missing-discriminator-conservative-fallback">5. OR with Missing Discriminator (Conservative Fallback)<a class="headerlink" href="#5-or-with-missing-discriminator-conservative-fallback" title="Permanent link">&para;</a></h3>
+<p><strong>Query:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Table&#39;</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">has_sem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">FALSE</span>
+</code></pre></div></p>
+<p><strong>Routing:</strong>
+- Extracts: <code>None</code> (fallback signal)
+- Routes to: <strong>ALL collections</strong>
+- <strong>Why</strong>: Second OR branch could match records in ANY collection
+- <strong>Performance</strong>: Conservative but correct 🐢</p>
+<p><strong>Optimization:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1">-- If you want only Table records, use AND:</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Table&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">has_sem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">FALSE</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="err">→</span><span class="w"> </span><span class="n">Routes</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="k">Table</span><span class="w"> </span><span class="n">collections</span><span class="w"> </span><span class="k">only</span><span class="w"> </span><span class="err">⚡</span>
+</code></pre></div></p>
+<hr />
+<h3 id="6-no-discriminator-fallback">6. No Discriminator (Fallback)<a class="headerlink" href="#6-no-discriminator-fallback" title="Permanent link">&para;</a></h3>
+<p><strong>Query:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;active&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="k">year</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">2020</span>
+</code></pre></div></p>
+<p><strong>Routing:</strong>
+- Extracts: <code>None</code> (no discriminator found)
+- Routes to: <strong>ALL collections</strong>
+- <strong>Performance</strong>: Full scan 🐢</p>
+<hr />
+<h2 id="or-predicate-routing">OR Predicate Routing<a class="headerlink" href="#or-predicate-routing" title="Permanent link">&para;</a></h2>
+<p>This section details edge cases and behaviors specific to OR predicates.</p>
+<h3 id="the-or-rule">The OR Rule<a class="headerlink" href="#the-or-rule" title="Permanent link">&para;</a></h3>
+<p><strong>For OR predicates:</strong> If <strong>ANY</strong> branch lacks the discriminator field, we must query <strong>all</strong> collections to prevent under-routing.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">branch_vals</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">branch_vals</span> <span class="ow">in</span> <span class="n">branch_values_list</span><span class="p">):</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>    <span class="k">return</span> <span class="nb">set</span><span class="p">()</span>  <span class="c1"># Signal: query all collections</span>
+</code></pre></div>
+<h3 id="edge-cases-catalog">Edge Cases Catalog<a class="headerlink" href="#edge-cases-catalog" title="Permanent link">&para;</a></h3>
+<h4 id="1-simple-or-with-same-field">1. Simple OR with Same Field ✅<a class="headerlink" href="#1-simple-or-with-same-field" title="Permanent link">&para;</a></h4>
+<p><strong>Query:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Table&#39;</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Field&#39;</span>
+</code></pre></div></p>
+<p><strong>Behavior:</strong>
+- Extracts: <code>{'Table', 'Field'}</code>
+- Routes to: Union of Table and Field collections
+- <strong>Test:</strong> <code>test_extract_metadata_values_with_or_single_field</code></p>
+<hr />
+<h4 id="2-or-with-different-fields-triggers-fallback">2. OR with Different Fields (Triggers Fallback) ⚠️<a class="headerlink" href="#2-or-with-different-fields-triggers-fallback" title="Permanent link">&para;</a></h4>
+<p><strong>Query:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Table&#39;</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">has_sem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">FALSE</span>
+</code></pre></div></p>
+<p><strong>Behavior:</strong>
+- Extracts: <code>None</code> (fallback)
+- Routes to: <strong>ALL collections</strong>
+- <strong>Why</strong>: <code>has_sem = FALSE</code> could match records in any collection
+- <strong>Test:</strong> <code>test_extract_metadata_values_with_or_different_fields</code></p>
+<hr />
+<h4 id="3-or-with-nested-and">3. OR with Nested AND ✅<a class="headerlink" href="#3-or-with-nested-and" title="Permanent link">&para;</a></h4>
+<p><strong>Query:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Table&#39;</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">      </span><span class="k">OR</span><span class="w"> </span><span class="p">(</span><span class="n">metadata</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Field&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">fieldname</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;lang&#39;</span><span class="p">)</span>
+</code></pre></div></p>
+<p><strong>Behavior:</strong>
+- Extracts: <code>{'Table', 'Field'}</code>
+- Routes to: Union of Table and Field collections
+- <strong>Why</strong>: Both OR branches contain discriminators
+- <strong>Test:</strong> <code>test_extract_or_with_nested_and</code></p>
+<hr />
+<h4 id="4-multiple-or-branches-with-and">4. Multiple OR Branches with AND ✅<a class="headerlink" href="#4-multiple-or-branches-with-and" title="Permanent link">&para;</a></h4>
+<p><strong>Query:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="k">WHERE</span><span class="w"> </span><span class="p">(</span><span class="n">metadata</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Table&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="k">system</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;S4&#39;</span><span class="p">)</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">      </span><span class="k">OR</span><span class="w"> </span><span class="p">(</span><span class="n">metadata</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Field&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">fieldname</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;lang&#39;</span><span class="p">)</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">      </span><span class="k">OR</span><span class="w"> </span><span class="p">(</span><span class="n">metadata</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;View&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">TRUE</span><span class="p">)</span>
+</code></pre></div></p>
+<p><strong>Behavior:</strong>
+- Extracts: <code>{'Table', 'Field', 'View'}</code>
+- Routes to: Union of all three models
+- <strong>Test:</strong> <code>test_extract_complex_or_with_multiple_nested_ands</code></p>
+<hr />
+<h4 id="5-deeply-nested-orand">5. Deeply Nested OR/AND ✅<a class="headerlink" href="#5-deeply-nested-orand" title="Permanent link">&para;</a></h4>
+<p><strong>Query:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="k">WHERE</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">    </span><span class="p">(</span><span class="n">metadata</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Table&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="k">system</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;ECC&#39;</span><span class="p">)</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">    </span><span class="k">OR</span><span class="w"> </span><span class="p">(</span>
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a><span class="w">        </span><span class="n">metadata</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Field&#39;</span>
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a><span class="w">        </span><span class="k">AND</span><span class="w"> </span><span class="p">(</span><span class="n">metadata</span><span class="p">.</span><span class="k">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;CHAR&#39;</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="k">type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;NUMC&#39;</span><span class="p">)</span>
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a><span class="w">    </span><span class="p">)</span>
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a><span class="p">)</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;View&#39;</span>
+</code></pre></div></p>
+<p><strong>Behavior:</strong>
+- Extracts: <code>{'Table', 'Field', 'View'}</code>
+- Routes to: Union of all three models
+- <strong>Handles arbitrary nesting depth</strong>
+- <strong>Test:</strong> <code>test_extract_deeply_nested_or_and</code></p>
+<hr />
+<h4 id="6-or-with-partial-discriminators-triggers-fallback">6. OR with Partial Discriminators (Triggers Fallback) ⚠️<a class="headerlink" href="#6-or-with-partial-discriminators-triggers-fallback" title="Permanent link">&para;</a></h4>
+<p><strong>Query:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="k">WHERE</span><span class="w"> </span><span class="p">(</span><span class="n">metadata</span><span class="p">.</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;active&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="k">year</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">2020</span><span class="p">)</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">      </span><span class="k">OR</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Table&#39;</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">      </span><span class="k">OR</span><span class="w"> </span><span class="p">(</span><span class="n">metadata</span><span class="p">.</span><span class="n">has_sem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">TRUE</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">env</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;prod&#39;</span><span class="p">)</span>
+</code></pre></div></p>
+<p><strong>Behavior:</strong>
+- Extracts: <code>None</code> (fallback)
+- Routes to: <strong>ALL collections</strong>
+- <strong>Why</strong>: Branches 1 and 3 lack discriminators
+- <strong>Test:</strong> <code>test_extract_or_with_only_one_branch_having_target_field</code></p>
+<hr />
+<h4 id="7-complex-andor-within-and-context">7. Complex AND/OR Within AND Context ✅<a class="headerlink" href="#7-complex-andor-within-and-context" title="Permanent link">&para;</a></h4>
+<p><strong>Query:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">environment</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;prod&#39;</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">      </span><span class="k">AND</span><span class="w"> </span><span class="p">(</span><span class="n">metadata</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Table&#39;</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Field&#39;</span><span class="p">)</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">      </span><span class="k">AND</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="k">year</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">2020</span>
+</code></pre></div></p>
+<p><strong>Behavior:</strong>
+- Extracts: <code>{'Table', 'Field'}</code>
+- Routes to: Union of Table and Field collections
+- <strong>Why</strong>: Top-level AND doesn't affect OR union extraction
+- <strong>Test:</strong> <code>test_extract_with_complex_or_and_and</code></p>
+<hr />
+<h4 id="8-deduplication-of-overlapping-collections">8. Deduplication of Overlapping Collections ✅<a class="headerlink" href="#8-deduplication-of-overlapping-collections" title="Permanent link">&para;</a></h4>
+<p><strong>Query:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Table&#39;</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Field&#39;</span>
+</code></pre></div></p>
+<p><strong>Setup:</strong>
+- Table → [coll_1, shared_coll]
+- Field → [coll_2, shared_coll]</p>
+<p><strong>Behavior:</strong>
+- Routes to: <code>[coll_1, coll_2, shared_coll]</code> (deduplicated)
+- Ensures <code>shared_coll</code> is only queried once
+- <strong>Test:</strong> <code>test_router_deduplicates_collections_in_union</code></p>
+<hr />
+<h3 id="or-routing-summary-table">OR Routing Summary Table<a class="headerlink" href="#or-routing-summary-table" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Query Pattern</th>
+<th>Extracts</th>
+<th>Routes To</th>
+<th>Performance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>A OR B</code> (both discriminators)</td>
+<td>{A, B}</td>
+<td>A ∪ B</td>
+<td>⚡⚡ Efficient</td>
+</tr>
+<tr>
+<td><code>A OR (B AND x)</code> (both have discriminators)</td>
+<td>{A, B}</td>
+<td>A ∪ B</td>
+<td>⚡⚡ Efficient</td>
+</tr>
+<tr>
+<td><code>A OR x</code> (second lacks discriminator)</td>
+<td>None</td>
+<td>ALL</td>
+<td>🐢 Fallback</td>
+</tr>
+<tr>
+<td><code>(A AND x) OR (B AND y)</code></td>
+<td>{A, B}</td>
+<td>A ∪ B</td>
+<td>⚡⚡ Efficient</td>
+</tr>
+<tr>
+<td><code>(x AND y) OR A OR (z AND w)</code></td>
+<td>None</td>
+<td>ALL</td>
+<td>🐢 Fallback</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="optimization-analysis">Optimization Analysis<a class="headerlink" href="#optimization-analysis" title="Permanent link">&para;</a></h2>
+<p>This section documents deep analysis of the routing algorithm to verify optimality.</p>
+<h3 id="research-question">Research Question<a class="headerlink" href="#research-question" title="Permanent link">&para;</a></h3>
+<p><em>"Can we optimize the routing algorithm to be more efficient while maintaining zero under-routing?"</em></p>
+<h3 id="test-cases-analyzed">Test Cases Analyzed<a class="headerlink" href="#test-cases-analyzed" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="c1"># Test 1: AND with discriminator + OR without</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="n">WHERE</span> <span class="n">model</span> <span class="o">=</span> <span class="s1">&#39;Table&#39;</span> <span class="n">AND</span> <span class="p">(</span><span class="n">status</span> <span class="o">=</span> <span class="s1">&#39;active&#39;</span> <span class="n">OR</span> <span class="n">year</span> <span class="o">&gt;</span> <span class="mi">2020</span><span class="p">)</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="err">→</span> <span class="n">Result</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Table&#39;</span><span class="p">}</span> <span class="err">✅</span> <span class="n">Optimal</span>
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a><span class="c1"># Test 2: Nested OR with one branch lacking discriminator</span>
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a><span class="n">WHERE</span> <span class="p">(</span><span class="n">model</span> <span class="o">=</span> <span class="s1">&#39;Table&#39;</span> <span class="n">OR</span> <span class="n">model</span> <span class="o">=</span> <span class="s1">&#39;Field&#39;</span><span class="p">)</span> <span class="n">OR</span> <span class="p">(</span><span class="n">model</span> <span class="o">=</span> <span class="s1">&#39;View&#39;</span> <span class="n">OR</span> <span class="n">status</span> <span class="o">=</span> <span class="s1">&#39;active&#39;</span><span class="p">)</span>
+<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a><span class="err">→</span> <span class="n">Result</span><span class="p">:</span> <span class="kc">None</span> <span class="p">(</span><span class="n">ALL</span><span class="p">)</span> <span class="err">✅</span> <span class="n">Correct</span> <span class="p">(</span><span class="n">conservative</span><span class="p">)</span>
+<a id="__codelineno-17-8" name="__codelineno-17-8" href="#__codelineno-17-8"></a>
+<a id="__codelineno-17-9" name="__codelineno-17-9" href="#__codelineno-17-9"></a><span class="c1"># Test 3: User&#39;s case - OR with nested AND</span>
+<a id="__codelineno-17-10" name="__codelineno-17-10" href="#__codelineno-17-10"></a><span class="n">WHERE</span> <span class="n">model</span> <span class="o">=</span> <span class="s1">&#39;Table&#39;</span> <span class="n">OR</span> <span class="p">(</span><span class="n">model</span> <span class="o">=</span> <span class="s1">&#39;Field&#39;</span> <span class="n">AND</span> <span class="n">fieldname</span> <span class="o">=</span> <span class="s1">&#39;lang&#39;</span><span class="p">)</span>
+<a id="__codelineno-17-11" name="__codelineno-17-11" href="#__codelineno-17-11"></a><span class="err">→</span> <span class="n">Result</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Table&#39;</span><span class="p">,</span> <span class="s1">&#39;Field&#39;</span><span class="p">}</span> <span class="err">✅</span> <span class="n">Optimal</span>
+<a id="__codelineno-17-12" name="__codelineno-17-12" href="#__codelineno-17-12"></a>
+<a id="__codelineno-17-13" name="__codelineno-17-13" href="#__codelineno-17-13"></a><span class="c1"># Test 4: Multiple AND branches in OR</span>
+<a id="__codelineno-17-14" name="__codelineno-17-14" href="#__codelineno-17-14"></a><span class="n">WHERE</span> <span class="p">(</span><span class="n">model</span> <span class="o">=</span> <span class="s1">&#39;Table&#39;</span> <span class="n">AND</span> <span class="n">system</span> <span class="o">=</span> <span class="s1">&#39;S4&#39;</span><span class="p">)</span> <span class="n">OR</span> <span class="p">(</span><span class="n">model</span> <span class="o">=</span> <span class="s1">&#39;Field&#39;</span> <span class="n">AND</span> <span class="n">required</span> <span class="o">=</span> <span class="n">TRUE</span><span class="p">)</span>
+<a id="__codelineno-17-15" name="__codelineno-17-15" href="#__codelineno-17-15"></a><span class="err">→</span> <span class="n">Result</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Table&#39;</span><span class="p">,</span> <span class="s1">&#39;Field&#39;</span><span class="p">}</span> <span class="err">✅</span> <span class="n">Optimal</span>
+<a id="__codelineno-17-16" name="__codelineno-17-16" href="#__codelineno-17-16"></a>
+<a id="__codelineno-17-17" name="__codelineno-17-17" href="#__codelineno-17-17"></a><span class="c1"># Test 5: AND with two ORs (semantic impossibility)</span>
+<a id="__codelineno-17-18" name="__codelineno-17-18" href="#__codelineno-17-18"></a><span class="n">WHERE</span> <span class="p">(</span><span class="n">model</span> <span class="o">=</span> <span class="s1">&#39;Table&#39;</span> <span class="n">OR</span> <span class="n">model</span> <span class="o">=</span> <span class="s1">&#39;Field&#39;</span><span class="p">)</span> <span class="n">AND</span> <span class="p">(</span><span class="n">model</span> <span class="o">=</span> <span class="s1">&#39;View&#39;</span> <span class="n">OR</span> <span class="n">model</span> <span class="o">=</span> <span class="s1">&#39;Function&#39;</span><span class="p">)</span>
+<a id="__codelineno-17-19" name="__codelineno-17-19" href="#__codelineno-17-19"></a><span class="err">→</span> <span class="n">Result</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Table&#39;</span><span class="p">,</span> <span class="s1">&#39;Field&#39;</span><span class="p">,</span> <span class="s1">&#39;View&#39;</span><span class="p">,</span> <span class="s1">&#39;Function&#39;</span><span class="p">}</span> <span class="err">✅</span> <span class="n">Union</span> <span class="n">of</span> <span class="nb">all</span>
+<a id="__codelineno-17-20" name="__codelineno-17-20" href="#__codelineno-17-20"></a>
+<a id="__codelineno-17-21" name="__codelineno-17-21" href="#__codelineno-17-21"></a><span class="c1"># Test 6: Triple-nested AND&gt;OR&gt;AND</span>
+<a id="__codelineno-17-22" name="__codelineno-17-22" href="#__codelineno-17-22"></a><span class="n">WHERE</span> <span class="n">model</span> <span class="o">=</span> <span class="s1">&#39;Table&#39;</span> <span class="n">AND</span> <span class="p">(</span><span class="n">status</span> <span class="o">=</span> <span class="s1">&#39;X&#39;</span> <span class="n">OR</span> <span class="p">(</span><span class="n">model</span> <span class="o">=</span> <span class="s1">&#39;Field&#39;</span> <span class="n">AND</span> <span class="n">year</span> <span class="o">&gt;</span> <span class="mi">2020</span><span class="p">))</span>
+<a id="__codelineno-17-23" name="__codelineno-17-23" href="#__codelineno-17-23"></a><span class="err">→</span> <span class="n">Result</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Table&#39;</span><span class="p">}</span> <span class="err">✅</span> <span class="n">Optimal</span>
+<a id="__codelineno-17-24" name="__codelineno-17-24" href="#__codelineno-17-24"></a>
+<a id="__codelineno-17-25" name="__codelineno-17-25" href="#__codelineno-17-25"></a><span class="c1"># Test 7: Pure non-discriminator query</span>
+<a id="__codelineno-17-26" name="__codelineno-17-26" href="#__codelineno-17-26"></a><span class="n">WHERE</span> <span class="n">status</span> <span class="o">=</span> <span class="s1">&#39;active&#39;</span> <span class="n">AND</span> <span class="n">year</span> <span class="o">&gt;</span> <span class="mi">2020</span>
+<a id="__codelineno-17-27" name="__codelineno-17-27" href="#__codelineno-17-27"></a><span class="err">→</span> <span class="n">Result</span><span class="p">:</span> <span class="kc">None</span> <span class="p">(</span><span class="n">ALL</span><span class="p">)</span> <span class="err">✅</span> <span class="n">Correct</span>
+<a id="__codelineno-17-28" name="__codelineno-17-28" href="#__codelineno-17-28"></a>
+<a id="__codelineno-17-29" name="__codelineno-17-29" href="#__codelineno-17-29"></a><span class="c1"># Test 8: NOT IN (should not extract)</span>
+<a id="__codelineno-17-30" name="__codelineno-17-30" href="#__codelineno-17-30"></a><span class="n">WHERE</span> <span class="n">model</span> <span class="n">NOT</span> <span class="n">IN</span> <span class="p">(</span><span class="s1">&#39;Table&#39;</span><span class="p">,</span> <span class="s1">&#39;Field&#39;</span><span class="p">)</span>
+<a id="__codelineno-17-31" name="__codelineno-17-31" href="#__codelineno-17-31"></a><span class="err">→</span> <span class="n">Result</span><span class="p">:</span> <span class="kc">None</span> <span class="p">(</span><span class="n">ALL</span><span class="p">)</span> <span class="err">✅</span> <span class="n">Correct</span> <span class="p">(</span><span class="n">can</span><span class="s1">&#39;t route on negation)</span>
+</code></pre></div>
+<p><strong>All 8 test cases passed! ✅</strong></p>
+<h3 id="algorithm-rules">Algorithm Rules<a class="headerlink" href="#algorithm-rules" title="Permanent link">&para;</a></h3>
+<p>The algorithm uses two complementary rules:</p>
+<h4 id="rule-1-or-rule-conservative">Rule 1: OR Rule (Conservative)<a class="headerlink" href="#rule-1-or-rule-conservative" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="k">if</span> <span class="n">predicate</span><span class="o">.</span><span class="n">operator</span> <span class="o">==</span> <span class="s2">&quot;OR&quot;</span><span class="p">:</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>    <span class="c1"># Check if ANY branch lacks discriminator</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">branch_vals</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">branch_vals</span> <span class="ow">in</span> <span class="n">branch_values_list</span><span class="p">):</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>        <span class="k">return</span> <span class="nb">set</span><span class="p">()</span>  <span class="c1"># Fallback - prevents under-routing</span>
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>    <span class="c1"># Otherwise, take union</span>
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>    <span class="k">for</span> <span class="n">branch_vals</span> <span class="ow">in</span> <span class="n">branch_values_list</span><span class="p">:</span>
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>        <span class="n">values</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">branch_vals</span><span class="p">)</span>
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a>    <span class="k">return</span> <span class="n">values</span>
+</code></pre></div>
+<p><strong>Rationale:</strong> If any OR branch lacks the discriminator, that branch could match records in <strong>any</strong> collection → must query all.</p>
+<h4 id="rule-2-and-rule-optimistic">Rule 2: AND Rule (Optimistic)<a class="headerlink" href="#rule-2-and-rule-optimistic" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="k">else</span><span class="p">:</span>  <span class="c1"># AND</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>    <span class="c1"># Collect from all branches</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>    <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">predicate</span><span class="o">.</span><span class="n">predicates</span><span class="p">:</span>
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>        <span class="n">values</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_collect_metadata_values</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>    <span class="k">return</span> <span class="n">values</span>
+</code></pre></div>
+<p><strong>Rationale:</strong> AND restricts results to records satisfying <strong>all</strong> conditions → union discriminators from all branches.</p>
+<h3 id="why-this-is-optimal">Why This Is Optimal<a class="headerlink" href="#why-this-is-optimal" title="Permanent link">&para;</a></h3>
+<p><strong>Mathematical Property:</strong> The algorithm achieves the <strong>maximal routing efficiency</strong> subject to the constraint of <strong>zero under-routing</strong>.</p>
+<p><strong>Proof Sketch:</strong>
+1. <strong>Soundness (Zero Under-Routing)</strong>: Any query result matches at least one OR branch. If a branch lacks discriminators, we fallback to all collections, guaranteeing we query the collection containing that result.
+2. <strong>Completeness (Maximum Efficiency)</strong>: If all OR branches have discriminators, we extract the union of discriminator values, which is the minimal set of collections needed to cover all possible results.
+3. <strong>Optimality</strong>: Any further "optimization" would either (a) introduce under-routing risk, or (b) add complexity without efficiency gain.</p>
+<h3 id="rejected-optimizations">Rejected Optimizations<a class="headerlink" href="#rejected-optimizations" title="Permanent link">&para;</a></h3>
+<p>We considered several potential optimizations and rejected them:</p>
+<h4 id="partial-or-optimization">❌ Partial OR Optimization<a class="headerlink" href="#partial-or-optimization" title="Permanent link">&para;</a></h4>
+<p><strong>Idea:</strong> For <code>WHERE model IN ('A', 'B') OR status='X'</code>, query union of (A∪B∪all_others)?</p>
+<p><strong>Rejected Because:</strong>
+- Complex and error-prone
+- Still queries almost all collections anyway
+- Risk of bugs in "all_others" calculation</p>
+<h4 id="cost-based-fallback">❌ Cost-Based Fallback<a class="headerlink" href="#cost-based-fallback" title="Permanent link">&para;</a></h4>
+<p><strong>Idea:</strong> If union exceeds 80% of collections, just query all?</p>
+<p><strong>Rejected Because:</strong>
+- This is a performance tweak, not a correctness improvement
+- Should be handled at a different layer (query planner)
+- Adds complexity to routing logic</p>
+<h4 id="smart-or-pruning">❌ Smart OR Pruning<a class="headerlink" href="#smart-or-pruning" title="Permanent link">&para;</a></h4>
+<p><strong>Idea:</strong> Analyze which OR branches are "dominant" and skip others?</p>
+<p><strong>Rejected Because:</strong>
+- Would introduce under-routing risk
+- Complex to implement correctly
+- Violates the zero under-routing guarantee</p>
+<h3 id="conclusion">Conclusion<a class="headerlink" href="#conclusion" title="Permanent link">&para;</a></h3>
+<p><strong>The current implementation is OPTIMAL</strong> ✅</p>
+<p>No additional logic needed. The algorithm achieves perfect balance:
+- ✅ Zero under-routing (correctness)
+- ✅ Maximum efficiency (performance)
+- ✅ Simple &amp; maintainable (clarity)</p>
+<p>Any further "optimization" would compromise one of these properties.</p>
+<h3 id="recommended-enhancement-logging">Recommended Enhancement: Logging<a class="headerlink" href="#recommended-enhancement-logging" title="Permanent link">&para;</a></h3>
+<p>The only suggested improvement is <strong>user-facing logging</strong> when fallback occurs:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">branch_vals</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">branch_vals</span> <span class="ow">in</span> <span class="n">branch_values_list</span><span class="p">):</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;OR predicate has branch without discriminator - querying all collections for correctness&quot;</span><span class="p">)</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>    <span class="k">return</span> <span class="nb">set</span><span class="p">()</span>
+</code></pre></div>
+<p>This helps users understand query performance and optimize their queries accordingly.</p>
+<hr />
+<h2 id="implementation-details">Implementation Details<a class="headerlink" href="#implementation-details" title="Permanent link">&para;</a></h2>
+<h3 id="extraction-algorithm">Extraction Algorithm<a class="headerlink" href="#extraction-algorithm" title="Permanent link">&para;</a></h3>
+<p>The <code>extract_metadata_values()</code> function in <a href="https://github.com/GetAdriAI/chromasql/blob/main/analysis.py">chromasql/analysis.py</a>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="k">def</span><span class="w"> </span><span class="nf">_collect_metadata_values</span><span class="p">(</span><span class="n">predicate</span><span class="p">:</span> <span class="n">Predicate</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Collect metadata values from predicate tree.</span>
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a><span class="sd">    Returns empty set if we should query all collections (prevents under-routing).</span>
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a><span class="sd">    &quot;&quot;&quot;</span>
+<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">predicate</span><span class="p">,</span> <span class="n">BooleanPredicate</span><span class="p">):</span>
+<a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a>        <span class="k">if</span> <span class="n">predicate</span><span class="o">.</span><span class="n">operator</span> <span class="o">==</span> <span class="s2">&quot;OR&quot;</span><span class="p">:</span>
+<a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a>            <span class="c1"># Check if ANY branch lacks discriminator</span>
+<a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a>            <span class="n">branch_values_list</span> <span class="o">=</span> <span class="p">[]</span>
+<a id="__codelineno-21-10" name="__codelineno-21-10" href="#__codelineno-21-10"></a>            <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">predicate</span><span class="o">.</span><span class="n">predicates</span><span class="p">:</span>
+<a id="__codelineno-21-11" name="__codelineno-21-11" href="#__codelineno-21-11"></a>                <span class="n">branch_values</span> <span class="o">=</span> <span class="n">_collect_metadata_values</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+<a id="__codelineno-21-12" name="__codelineno-21-12" href="#__codelineno-21-12"></a>                <span class="n">branch_values_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">branch_values</span><span class="p">)</span>
+<a id="__codelineno-21-13" name="__codelineno-21-13" href="#__codelineno-21-13"></a>
+<a id="__codelineno-21-14" name="__codelineno-21-14" href="#__codelineno-21-14"></a>            <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">branch_vals</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">branch_vals</span> <span class="ow">in</span> <span class="n">branch_values_list</span><span class="p">):</span>
+<a id="__codelineno-21-15" name="__codelineno-21-15" href="#__codelineno-21-15"></a>                <span class="k">return</span> <span class="nb">set</span><span class="p">()</span>  <span class="c1"># Signal: query all collections</span>
+<a id="__codelineno-21-16" name="__codelineno-21-16" href="#__codelineno-21-16"></a>
+<a id="__codelineno-21-17" name="__codelineno-21-17" href="#__codelineno-21-17"></a>            <span class="c1"># Union of all branch values</span>
+<a id="__codelineno-21-18" name="__codelineno-21-18" href="#__codelineno-21-18"></a>            <span class="n">values</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+<a id="__codelineno-21-19" name="__codelineno-21-19" href="#__codelineno-21-19"></a>            <span class="k">for</span> <span class="n">branch_vals</span> <span class="ow">in</span> <span class="n">branch_values_list</span><span class="p">:</span>
+<a id="__codelineno-21-20" name="__codelineno-21-20" href="#__codelineno-21-20"></a>                <span class="n">values</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">branch_vals</span><span class="p">)</span>
+<a id="__codelineno-21-21" name="__codelineno-21-21" href="#__codelineno-21-21"></a>            <span class="k">return</span> <span class="n">values</span>
+<a id="__codelineno-21-22" name="__codelineno-21-22" href="#__codelineno-21-22"></a>        <span class="k">else</span><span class="p">:</span>  <span class="c1"># AND</span>
+<a id="__codelineno-21-23" name="__codelineno-21-23" href="#__codelineno-21-23"></a>            <span class="c1"># Collect from all branches</span>
+<a id="__codelineno-21-24" name="__codelineno-21-24" href="#__codelineno-21-24"></a>            <span class="n">values</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+<a id="__codelineno-21-25" name="__codelineno-21-25" href="#__codelineno-21-25"></a>            <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">predicate</span><span class="o">.</span><span class="n">predicates</span><span class="p">:</span>
+<a id="__codelineno-21-26" name="__codelineno-21-26" href="#__codelineno-21-26"></a>                <span class="n">values</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">_collect_metadata_values</span><span class="p">(</span><span class="n">child</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
+<a id="__codelineno-21-27" name="__codelineno-21-27" href="#__codelineno-21-27"></a>            <span class="k">return</span> <span class="n">values</span>
+<a id="__codelineno-21-28" name="__codelineno-21-28" href="#__codelineno-21-28"></a>
+<a id="__codelineno-21-29" name="__codelineno-21-29" href="#__codelineno-21-29"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">predicate</span><span class="p">,</span> <span class="n">ComparisonPredicate</span><span class="p">):</span>
+<a id="__codelineno-21-30" name="__codelineno-21-30" href="#__codelineno-21-30"></a>        <span class="k">if</span> <span class="n">predicate</span><span class="o">.</span><span class="n">operator</span> <span class="o">==</span> <span class="s2">&quot;=&quot;</span> <span class="ow">and</span> <span class="n">_matches_field</span><span class="p">(</span><span class="n">predicate</span><span class="o">.</span><span class="n">field</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+<a id="__codelineno-21-31" name="__codelineno-21-31" href="#__codelineno-21-31"></a>            <span class="k">return</span> <span class="p">{</span><span class="n">predicate</span><span class="o">.</span><span class="n">value</span><span class="p">}</span>
+<a id="__codelineno-21-32" name="__codelineno-21-32" href="#__codelineno-21-32"></a>        <span class="k">return</span> <span class="nb">set</span><span class="p">()</span>
+<a id="__codelineno-21-33" name="__codelineno-21-33" href="#__codelineno-21-33"></a>
+<a id="__codelineno-21-34" name="__codelineno-21-34" href="#__codelineno-21-34"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">predicate</span><span class="p">,</span> <span class="n">InPredicate</span><span class="p">):</span>
+<a id="__codelineno-21-35" name="__codelineno-21-35" href="#__codelineno-21-35"></a>        <span class="k">if</span> <span class="ow">not</span> <span class="n">predicate</span><span class="o">.</span><span class="n">negated</span> <span class="ow">and</span> <span class="n">_matches_field</span><span class="p">(</span><span class="n">predicate</span><span class="o">.</span><span class="n">field</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+<a id="__codelineno-21-36" name="__codelineno-21-36" href="#__codelineno-21-36"></a>            <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">predicate</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+<a id="__codelineno-21-37" name="__codelineno-21-37" href="#__codelineno-21-37"></a>        <span class="k">return</span> <span class="nb">set</span><span class="p">()</span>
+<a id="__codelineno-21-38" name="__codelineno-21-38" href="#__codelineno-21-38"></a>
+<a id="__codelineno-21-39" name="__codelineno-21-39" href="#__codelineno-21-39"></a>    <span class="k">return</span> <span class="nb">set</span><span class="p">()</span>
+</code></pre></div>
+<h3 id="router-logic">Router Logic<a class="headerlink" href="#router-logic" title="Permanent link">&para;</a></h3>
+<p>The <code>MetadataFieldRouter</code> in <a href="https://github.com/GetAdriAI/chromasql/blob/main/adapters.py">chromasql/adapters.py</a>:</p>
+<ol>
+<li>Calls <code>extract_metadata_values()</code> to get discriminator values</li>
+<li>Maps each value to collections via <code>query_config</code></li>
+<li>Takes <strong>union</strong> of all collection lists</li>
+<li>Deduplicates the final list</li>
+<li>Returns <code>None</code> if no values found → triggers fallback</li>
+</ol>
+<h3 id="query-config-format">Query Config Format<a class="headerlink" href="#query-config-format" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="p">{</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="w">  </span><span class="nt">&quot;model_to_collections&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a><span class="w">    </span><span class="nt">&quot;Table&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a><span class="w">      </span><span class="nt">&quot;collections&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;coll_1&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;coll_2&quot;</span><span class="p">],</span>
+<a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a><span class="w">      </span><span class="nt">&quot;total_documents&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">1000</span><span class="p">,</span>
+<a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a><span class="w">      </span><span class="nt">&quot;partitions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;partition_1&quot;</span><span class="p">]</span>
+<a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a><span class="w">    </span><span class="p">},</span>
+<a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a><span class="w">    </span><span class="nt">&quot;Field&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a><span class="w">      </span><span class="nt">&quot;collections&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;coll_3&quot;</span><span class="p">],</span>
+<a id="__codelineno-22-10" name="__codelineno-22-10" href="#__codelineno-22-10"></a><span class="w">      </span><span class="nt">&quot;total_documents&quot;</span><span class="p">:</span><span class="w"> </span><span class="mi">500</span><span class="p">,</span>
+<a id="__codelineno-22-11" name="__codelineno-22-11" href="#__codelineno-22-11"></a><span class="w">      </span><span class="nt">&quot;partitions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;partition_2&quot;</span><span class="p">]</span>
+<a id="__codelineno-22-12" name="__codelineno-22-12" href="#__codelineno-22-12"></a><span class="w">    </span><span class="p">}</span>
+<a id="__codelineno-22-13" name="__codelineno-22-13" href="#__codelineno-22-13"></a><span class="w">  </span><span class="p">},</span>
+<a id="__codelineno-22-14" name="__codelineno-22-14" href="#__codelineno-22-14"></a><span class="w">  </span><span class="nt">&quot;collection_to_models&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<a id="__codelineno-22-15" name="__codelineno-22-15" href="#__codelineno-22-15"></a><span class="w">    </span><span class="nt">&quot;coll_1&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;Table&quot;</span><span class="p">],</span>
+<a id="__codelineno-22-16" name="__codelineno-22-16" href="#__codelineno-22-16"></a><span class="w">    </span><span class="nt">&quot;coll_2&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;Table&quot;</span><span class="p">],</span>
+<a id="__codelineno-22-17" name="__codelineno-22-17" href="#__codelineno-22-17"></a><span class="w">    </span><span class="nt">&quot;coll_3&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;Field&quot;</span><span class="p">]</span>
+<a id="__codelineno-22-18" name="__codelineno-22-18" href="#__codelineno-22-18"></a><span class="w">  </span><span class="p">}</span>
+<a id="__codelineno-22-19" name="__codelineno-22-19" href="#__codelineno-22-19"></a><span class="p">}</span>
+</code></pre></div>
+<hr />
+<h2 id="performance-guide">Performance Guide<a class="headerlink" href="#performance-guide" title="Permanent link">&para;</a></h2>
+<h3 id="query-optimization-tips">Query Optimization Tips<a class="headerlink" href="#query-optimization-tips" title="Permanent link">&para;</a></h3>
+<h4 id="do-use-discriminators-in-where">✅ DO: Use discriminators in WHERE<a class="headerlink" href="#do-use-discriminators-in-where" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="c1">-- Good: Routes to Table collections only</span>
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">sap_data</span>
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Table&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;active&#39;</span>
+</code></pre></div>
+<h4 id="do-use-or-with-discriminators">✅ DO: Use OR with discriminators<a class="headerlink" href="#do-use-or-with-discriminators" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="c1">-- Good: Routes to union of Table and Field</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">sap_data</span>
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Table&#39;</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Field&#39;</span>
+</code></pre></div>
+<h4 id="do-use-in-for-multiple-values">✅ DO: Use IN for multiple values<a class="headerlink" href="#do-use-in-for-multiple-values" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="c1">-- Good: Equivalent to OR, often more readable</span>
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">sap_data</span>
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="s1">&#39;Table&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;Field&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;View&#39;</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="caution-or-without-discriminator-triggers-fallback">⚠️ CAUTION: OR without discriminator triggers fallback<a class="headerlink" href="#caution-or-without-discriminator-triggers-fallback" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="c1">-- Queries ALL collections (conservative)</span>
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">sap_data</span>
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Table&#39;</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">has_sem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">FALSE</span>
+</code></pre></div>
+<p><strong>Optimization:</strong> Use AND instead:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="c1">-- Routes to Table collections only</span>
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">sap_data</span>
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Table&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">has_sem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">FALSE</span>
+</code></pre></div></p>
+<h4 id="caution-no-discriminator-full-scan">⚠️ CAUTION: No discriminator = full scan<a class="headerlink" href="#caution-no-discriminator-full-scan" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="c1">-- Queries ALL collections</span>
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">sap_data</span>
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;active&#39;</span>
+</code></pre></div>
+<p><strong>Optimization:</strong> Add discriminator filter:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="c1">-- Routes to Table collections only</span>
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">sap_data</span>
+<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Table&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;active&#39;</span>
+</code></pre></div></p>
+<h3 id="performance-matrix">Performance Matrix<a class="headerlink" href="#performance-matrix" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Query Type</th>
+<th>Collections Queried</th>
+<th>Performance</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Single discriminator</td>
+<td>2-3 / 37</td>
+<td>⚡⚡⚡ Best</td>
+<td><code>model = 'Table'</code></td>
+</tr>
+<tr>
+<td>Multiple discriminators</td>
+<td>6-9 / 37</td>
+<td>⚡⚡ Very Good</td>
+<td><code>model IN ('A', 'B', 'C')</code></td>
+</tr>
+<tr>
+<td>Union routing (10 values)</td>
+<td>~20 / 37</td>
+<td>⚡ Acceptable</td>
+<td>Large OR/IN list</td>
+</tr>
+<tr>
+<td>Fallback (mixed OR)</td>
+<td>37 / 37</td>
+<td>🐢 Conservative</td>
+<td><code>model = 'A' OR x = 1</code></td>
+</tr>
+<tr>
+<td>No discriminator</td>
+<td>37 / 37</td>
+<td>🐢 Full Scan</td>
+<td><code>status = 'active'</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="performance-monitoring">Performance Monitoring<a class="headerlink" href="#performance-monitoring" title="Permanent link">&para;</a></h3>
+<p>Use verbose logging to see routing decisions:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="k">async</span> <span class="k">with</span> <span class="n">QueryExecutor</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">fallback_to_all</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>    <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">executor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;SELECT ...&quot;</span><span class="p">)</span>
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Collections queried: </span><span class="si">{</span><span class="n">result</span><span class="o">.</span><span class="n">collections_queried</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+<hr />
+<h2 id="testing-coverage">Testing &amp; Coverage<a class="headerlink" href="#testing-coverage" title="Permanent link">&para;</a></h2>
+<h3 id="test-organization">Test Organization<a class="headerlink" href="#test-organization" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>tests/chromasql/
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>├── test_or_routing.py              # Unit tests for extraction logic (13 tests)
+<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>├── test_or_routing_integration.py  # Router integration tests (11 tests)
+<a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a>├── test_multi_collection.py        # Multi-collection execution (10 tests)
+<a id="__codelineno-31-5" name="__codelineno-31-5" href="#__codelineno-31-5"></a>└── test_analysis.py                # Analysis helper tests (3 tests)
+<a id="__codelineno-31-6" name="__codelineno-31-6" href="#__codelineno-31-6"></a>
+<a id="__codelineno-31-7" name="__codelineno-31-7" href="#__codelineno-31-7"></a>Total: 37 tests covering routing logic
+</code></pre></div>
+<h3 id="coverage-summary">Coverage Summary<a class="headerlink" href="#coverage-summary" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Category</th>
+<th>Tests</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Basic OR extraction</td>
+<td>3</td>
+<td>✅ All Passing</td>
+</tr>
+<tr>
+<td>Nested OR/AND combinations</td>
+<td>6</td>
+<td>✅ All Passing</td>
+</tr>
+<tr>
+<td>Fallback scenarios</td>
+<td>2</td>
+<td>✅ All Passing</td>
+</tr>
+<tr>
+<td>Router integration</td>
+<td>11</td>
+<td>✅ All Passing</td>
+</tr>
+<tr>
+<td>Multi-collection execution</td>
+<td>10</td>
+<td>✅ All Passing</td>
+</tr>
+<tr>
+<td>Analysis helpers</td>
+<td>3</td>
+<td>✅ All Passing</td>
+</tr>
+<tr>
+<td>Optimization analysis</td>
+<td>8</td>
+<td>✅ All Passing</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>43</strong></td>
+<td><strong>✅ All Passing</strong></td>
+</tr>
+</tbody>
+</table>
+<h3 id="running-tests">Running Tests<a class="headerlink" href="#running-tests" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="c1"># Run all routing tests</span>
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>poetry<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>tests/chromasql/test_or_routing*.py<span class="w"> </span>-v
+<a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a>
+<a id="__codelineno-32-4" name="__codelineno-32-4" href="#__codelineno-32-4"></a><span class="c1"># Run with coverage</span>
+<a id="__codelineno-32-5" name="__codelineno-32-5" href="#__codelineno-32-5"></a>poetry<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>tests/chromasql/<span class="w"> </span>--cov<span class="o">=</span>chromasql.analysis<span class="w"> </span>--cov<span class="o">=</span>chromasql.adapters
+<a id="__codelineno-32-6" name="__codelineno-32-6" href="#__codelineno-32-6"></a>
+<a id="__codelineno-32-7" name="__codelineno-32-7" href="#__codelineno-32-7"></a><span class="c1"># Run specific edge case</span>
+<a id="__codelineno-32-8" name="__codelineno-32-8" href="#__codelineno-32-8"></a>poetry<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>tests/chromasql/test_or_routing.py::test_extract_or_with_nested_and<span class="w"> </span>-v
+</code></pre></div>
+<hr />
+<h2 id="anti-patterns">Anti-Patterns<a class="headerlink" href="#anti-patterns" title="Permanent link">&para;</a></h2>
+<h3 id="partial-routing-for-mixed-or">❌ Partial Routing for Mixed OR<a class="headerlink" href="#partial-routing-for-mixed-or" title="Permanent link">&para;</a></h3>
+<p><strong>Bad Approach:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Table&#39;</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">has_sem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">FALSE</span>
+<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="err">→</span><span class="w"> </span><span class="n">Routes</span><span class="w"> </span><span class="k">ONLY</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="s1">&#39;Table&#39;</span><span class="w"> </span><span class="n">collections</span>
+<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="err">→</span><span class="w"> </span><span class="n">PROBLEM</span><span class="p">:</span><span class="w"> </span><span class="n">Misses</span><span class="w"> </span><span class="n">records</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">other</span><span class="w"> </span><span class="n">collections</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">has_sem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">FALSE</span><span class="o">!</span>
+</code></pre></div></p>
+<p><strong>ChromaSQL's Approach:</strong>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Table&#39;</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">has_sem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">FALSE</span>
+<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="err">→</span><span class="w"> </span><span class="n">Routes</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="k">ALL</span><span class="w"> </span><span class="n">collections</span><span class="w"> </span><span class="p">(</span><span class="n">fallback</span><span class="p">)</span>
+<a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a><span class="err">→</span><span class="w"> </span><span class="k">RESULT</span><span class="p">:</span><span class="w"> </span><span class="k">No</span><span class="w"> </span><span class="k">under</span><span class="o">-</span><span class="n">routing</span><span class="p">,</span><span class="w"> </span><span class="k">all</span><span class="w"> </span><span class="n">matching</span><span class="w"> </span><span class="n">records</span><span class="w"> </span><span class="k">found</span><span class="w"> </span><span class="err">✅</span>
+</code></pre></div></p>
+<h3 id="correct-pattern-use-and-for-specificity">✅ Correct Pattern: Use AND for Specificity<a class="headerlink" href="#correct-pattern-use-and-for-specificity" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="k">WHERE</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">model</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;Table&#39;</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="n">metadata</span><span class="p">.</span><span class="n">has_sem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">FALSE</span>
+<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a><span class="err">→</span><span class="w"> </span><span class="n">Routes</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="s1">&#39;Table&#39;</span><span class="w"> </span><span class="n">collections</span><span class="w"> </span><span class="k">only</span>
+<a id="__codelineno-35-3" name="__codelineno-35-3" href="#__codelineno-35-3"></a><span class="err">→</span><span class="w"> </span><span class="k">RESULT</span><span class="p">:</span><span class="w"> </span><span class="k">Only</span><span class="w"> </span><span class="k">Table</span><span class="w"> </span><span class="n">records</span><span class="w"> </span><span class="k">with</span><span class="w"> </span><span class="n">has_sem</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">FALSE</span><span class="w"> </span><span class="err">✅</span>
+</code></pre></div>
+<hr />
+<h2 id="references">References<a class="headerlink" href="#references" title="Permanent link">&para;</a></h2>
+<h3 id="source-code">Source Code<a class="headerlink" href="#source-code" title="Permanent link">&para;</a></h3>
+<ul>
+<li><a href="https://github.com/GetAdriAI/chromasql/blob/main/analysis.py">chromasql/analysis.py</a> - Metadata value extraction</li>
+<li><a href="https://github.com/GetAdriAI/chromasql/blob/main/adapters.py">chromasql/adapters.py</a> - MetadataFieldRouter implementation</li>
+<li><a href="https://github.com/GetAdriAI/chromasql/blob/main/multi_collection.py">chromasql/multi_collection.py</a> - Multi-collection execution</li>
+</ul>
+<hr />
+<p><strong>Document Version:</strong> 1.0</p>
+<p><strong>Release Date:</strong> November 1, 2025</p>
+<p><strong>Test Coverage:</strong> 43/43 tests passing</p>
+<p><strong>Total Project Tests:</strong> 151 (chromasql + query_lib)</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        
+  <nav class="md-footer__inner md-grid" aria-label="Footer" >
+    
+      <a href="../multi-collection-architecture/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Multi-Collection Architecture" rel="prev" >
+        <div class="md-footer__button md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+        </div>
+        <div class="md-footer__title">
+          <span class="md-footer__direction">
+            Previous
+          </span>
+          <div class="md-ellipsis">
+            Multi-Collection Architecture
+          </div>
+        </div>
+      </a>
+    
+    
+      <a href="../glossary/" class="md-footer__link md-footer__link--next" aria-label="Next: Glossary" rel="next" >
+        <div class="md-footer__title">
+          <span class="md-footer__direction">
+            Next
+          </span>
+          <div class="md-ellipsis">
+            Glossary
+          </div>
+        </div>
+        <div class="md-footer__button md-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+        </div>
+      </a>
+    
+  </nav>
+
+
+<footer class="md-footer">
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright" style="display: flex; justify-content: space-between; width: 100%; max-width: 100%;">
+        <!-- Left side -->
+        <span style="display: inline-flex; align-items: center; gap: 5px;">
+          ⚡ Created by the team at
+          <a href="https://research.getadri.ai/" target="_blank" style="display: flex; align-items: center;">
+            <img src="../../assets/adri-ai-logo-dark.svg" alt="Logo" style="height: 12px; width: auto;  margin-left: 5px; display: block;">
+          </a>
+        </span>
+        
+        <!-- Right side -->
+        <span>
+          Made with 
+          <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank">
+            Material for MkDocs
+          </a>
+        </span>
+      </div>
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.tabs", "navigation.indexes", "navigation.footer", "content.code.copy"], "search": "../../assets/javascripts/workers/search.7a47a382.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.e71a0d61.min.js"></script>
+      
+    
+  </body>
+</html>
